@@ -15,10 +15,14 @@
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="theme-color" content="#1f6feb">
+<style>html,body{margin:0;height:100%;background:#fff}iframe{position:fixed;top:0;left:0;width:100%;height:100%;border:0}</style>
 <script>
 var k=new URLSearchParams(location.search).get("k");
-location.replace("https://script.google.com/macros/s/AKfycbw0aOri7KloAq29a1Mksi3w-JlOoP4EgYUpoBJlwdqmgKVh72xGGPlxY0j9SGYUIqnJUw/exec"+(k?"?k="+encodeURIComponent(k):""));
+var f=document.createElement("iframe");
+f.src="https://script.google.com/macros/s/AKfycbw0aOri7KloAq29a1Mksi3w-JlOoP4EgYUpoBJlwdqmgKVh72xGGPlxY0j9SGYUIqnJUw/exec"+(k?"?k="+encodeURIComponent(k):"");
+window.addEventListener("DOMContentLoaded",function(){document.body.appendChild(f)});
 </script>
 </head>
-<body style="font-family:system-ui;text-align:center;padding:48px">Opening the water collection... · جارٍ فتح صفحة التحصيل</body>
+<body></body>
 </html>
+
