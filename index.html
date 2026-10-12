@@ -19,7 +19,8 @@
 <script>
 var k=new URLSearchParams(location.search).get("k");
 var f=document.createElement("iframe");
-f.src="https://script.google.com/macros/s/AKfycbw0aOri7KloAq29a1Mksi3w-JlOoP4EgYUpoBJlwdqmgKVh72xGGPlxY0j9SGYUIqnJUw/exec"+(k?"?k="+encodeURIComponent(k):"");
+var v=new URLSearchParams(location.search).get("v");
+f.src="https://script.google.com/macros/s/AKfycbw0aOri7KloAq29a1Mksi3w-JlOoP4EgYUpoBJlwdqmgKVh72xGGPlxY0j9SGYUIqnJUw/exec"+(k?"?k="+encodeURIComponent(k)+(v?"&v="+encodeURIComponent(v):""):"");
 window.addEventListener("DOMContentLoaded",function(){document.body.appendChild(f)});
 </script>
 </head>
