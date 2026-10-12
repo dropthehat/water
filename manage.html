@@ -5,10 +5,43 @@
 <title>Building Management</title>
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex">
-<style>html,body{margin:0;height:100%;background:#fff;font-family:system-ui,sans-serif}iframe{position:fixed;top:0;left:0;width:100%;height:100%;border:0}#g{display:none;max-width:280px;margin:25vh auto;text-align:center}#g input{font-size:22px;width:140px;text-align:center;padding:8px;letter-spacing:6px}#g button{display:block;margin:14px auto;font-size:16px;padding:8px 24px}</style>
+<meta name="color-scheme" content="light dark">
+<meta name="description" content="Shared Management · الإدارة المشتركة">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Shared Management">
+<meta property="og:title" content="Building Management">
+<meta property="og:description" content="Water · Block C · Directory">
+<meta property="og:image" content="https://dropthehat.github.io/water/manage-preview.jpg">
+<meta property="og:image:type" content="image/jpeg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="theme-color" content="#0b6cf0">
+<style>
+:root{--bg:#f1f7ff;--card:#fff;--ink:#0f1c2e;--mut:#5b6f8a;--line:#d9e5f5;--acc:#0b6cf0;--bad:#b42318}
+@media(prefers-color-scheme:dark){:root{--bg:#0d1520;--card:#142031;--ink:#e6eefb;--mut:#8fa6c4;--line:#233450;--acc:#4da3ff;--bad:#f87171}}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);font:16px/1.4 system-ui,-apple-system,sans-serif}
+iframe{position:fixed;top:0;left:0;width:100%;height:100%;border:0;background:var(--bg)}
+#g{display:none;max-width:340px;margin:18vh auto 0;padding:0 16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:24px 20px;text-align:center}
+.brand{display:flex;justify-content:center;align-items:center;gap:6px;font-size:11px;font-weight:700;letter-spacing:.05em;color:var(--acc);margin-bottom:6px}
+h1{font-size:22px;margin:0 0 18px}
+input{width:100%;font:600 24px system-ui,sans-serif;text-align:center;letter-spacing:8px;padding:12px;border:1.5px solid var(--line);border-radius:12px;background:transparent;color:var(--ink)}
+input:focus{outline:none;border-color:var(--acc)}
+button{width:100%;margin-top:12px;font:600 16px system-ui,sans-serif;border:0;border-radius:12px;padding:14px;background:var(--acc);color:#fff;cursor:pointer}
+#e{color:var(--bad);font-size:14px;font-weight:600;min-height:20px;margin-top:10px}
+.dots{display:flex;justify-content:center;gap:6px;margin-top:16px}.dots i{width:22px;height:6px;border-radius:3px}
+</style>
 </head>
 <body>
-<div id="g"><h3>Building Management</h3><input id="p" type="password" inputmode="numeric" maxlength="12" autocomplete="off" placeholder="PIN"><button id="b">Open</button><div id="e" style="color:#b00"></div></div>
+<div id="g"><div class="card">
+<div class="brand"><svg viewBox="0 0 24 24" width="13" height="13" aria-hidden="true"><path d="M12 2.5C8 7.6 5.5 11 5.5 14.5a6.5 6.5 0 0 0 13 0C18.5 11 16 7.6 12 2.5z" fill="currentColor"/></svg><span>Shared Management · الإدارة المشتركة</span></div>
+<h1>Building Management</h1>
+<input id="p" type="password" inputmode="numeric" maxlength="12" autocomplete="off" placeholder="PIN">
+<button id="b">Open</button>
+<div id="e"></div>
+<div class="dots"><i style="background:#e4572e"></i><i style="background:#f2a900"></i><i style="background:#0e9aa7"></i><i style="background:#7b4fd1"></i></div>
+</div></div>
 <script>
 var EXEC="https://script.google.com/macros/s/AKfycbwWW-5Wo2xeo4US0I9qj3wqYcRlu3ba38VNeONNs-SGZtEKYI0InYODnspvk9BXM2LFbQ/exec";
 var k=new URLSearchParams(location.search).get("k")||"";
@@ -16,7 +49,7 @@ var g=document.getElementById("g"),f=null;
 function sget(){try{return localStorage.getItem("bm_pin")||""}catch(e){return ""}}
 function sset(v){try{v?localStorage.setItem("bm_pin",v):localStorage.removeItem("bm_pin")}catch(e){}}
 function openDash(pin){g.style.display="none";if(f)f.remove();f=document.createElement("iframe");f.src=EXEC+"?k="+encodeURIComponent(k)+"&p="+encodeURIComponent(pin);document.body.appendChild(f)}
-function ask(msg){if(f){f.remove();f=null}g.style.display="block";document.getElementById("e").textContent=msg||""}
+function ask(msg){if(f){f.remove();f=null}g.style.display="block";document.getElementById("e").textContent=msg||"";document.getElementById("p").focus()}
 document.getElementById("b").onclick=function(){var v=document.getElementById("p").value.trim();if(v){sset(v);openDash(v)}};
 document.getElementById("p").onkeydown=function(e){if(e.key==="Enter")document.getElementById("b").click()};
 window.addEventListener("message",function(e){if(e.data==="badpin"){sset("");ask("Wrong PIN or link")}});
