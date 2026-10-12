@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Building Management</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<style>html,body{margin:0;height:100%;background:#fff;font-family:system-ui,sans-serif}iframe{position:fixed;top:0;left:0;width:100%;height:100%;border:0}#g{display:none;max-width:280px;margin:25vh auto;text-align:center}#g input{font-size:22px;width:140px;text-align:center;padding:8px;letter-spacing:6px}#g button{display:block;margin:14px auto;font-size:16px;padding:8px 24px}</style>
+</head>
+<body>
+<div id="g"><h3>Building Management</h3><input id="p" type="password" inputmode="numeric" maxlength="12" autocomplete="off" placeholder="PIN"><button id="b">Open</button><div id="e" style="color:#b00"></div></div>
+<script>
+var EXEC="https://script.google.com/macros/s/AKfycbwWW-5Wo2xeo4US0I9qj3wqYcRlu3ba38VNeONNs-SGZtEKYI0InYODnspvk9BXM2LFbQ/exec";
+var k=new URLSearchParams(location.search).get("k")||"";
+var g=document.getElementById("g"),f=null;
+function sget(){try{return localStorage.getItem("bm_pin")||""}catch(e){return ""}}
+function sset(v){try{v?localStorage.setItem("bm_pin",v):localStorage.removeItem("bm_pin")}catch(e){}}
+function openDash(pin){g.style.display="none";if(f)f.remove();f=document.createElement("iframe");f.src=EXEC+"?k="+encodeURIComponent(k)+"&p="+encodeURIComponent(pin);document.body.appendChild(f)}
+function ask(msg){if(f){f.remove();f=null}g.style.display="block";document.getElementById("e").textContent=msg||""}
+document.getElementById("b").onclick=function(){var v=document.getElementById("p").value.trim();if(v){sset(v);openDash(v)}};
+document.getElementById("p").onkeydown=function(e){if(e.key==="Enter")document.getElementById("b").click()};
+window.addEventListener("message",function(e){if(e.data==="badpin"){sset("");ask("Wrong PIN or link")}});
+var s=sget();if(s)openDash(s);else ask("");
+</script>
+</body>
+</html>
