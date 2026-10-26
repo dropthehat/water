@@ -1,0 +1,400 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Water Collection · تحصيل فاتورة المياه</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="Tick off who has paid · حدّد من دفع فاتورة المياه">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Water Collection">
+<meta property="og:url" content="https://dropthehat.github.io/water/">
+<meta property="og:title" content="Water Collection · تحصيل فاتورة المياه">
+<meta property="og:description" content="Tick off who has paid · حدّد من دفع فاتورة المياه">
+<meta property="og:image" content="https://dropthehat.github.io/water/preview.jpg">
+<meta property="og:image:type" content="image/jpeg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="theme-color" content="#1f6feb">
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://script.google.com">
+<link rel="preconnect" href="https://script.googleusercontent.com">
+<script>
+/* Anas's page now lives here on GitHub; Apps Script ("Water Collect") only sends and saves the data.
+   This small adapter gives the page the same google.script.run / google.script.url calls it used inside Apps Script,
+   so the page code below is unchanged. A building rep's link (Block A split, Block B/C/D pages) still opens the Apps Script page. */
+var APPV='2026-10-26a';
+(function(){
+ var EXEC='https://script.google.com/macros/s/AKfycbw1_923NlIrccRTfiNBTDzs8SxX4hmMlSNWHFu68kxA6pFHV9X3eIeBUu0tRy35EGwx4Q/exec';
+ var P=new URLSearchParams(location.search),K=P.get('k')||'',V=P.get('v')||'';
+ function frame(){var f=document.createElement('iframe');f.src=EXEC+(K?'?k='+encodeURIComponent(K)+(V?'&v='+encodeURIComponent(V):''):'');f.style.cssText='position:fixed;top:0;left:0;width:100%;height:100%;border:0;background:#fff;z-index:99999';document.body.appendChild(f)}
+ if(V){window.__FRAME=1;document.addEventListener('DOMContentLoaded',frame);}
+ function call(fn,args){return fetch(EXEC,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'rpc',fn:fn,args:args}),redirect:'follow'}).then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.json()})}
+ function runner(){var ok=function(){},no=function(){},o={withSuccessHandler:function(f){ok=f;return o},withFailureHandler:function(f){no=f;return o}};
+  ['getCollect','setPaid','setPaidH','setPaidX','setDiffOk'].forEach(function(fn){o[fn]=function(){
+   var a=[].slice.call(arguments);
+   call(fn,a).then(function(j){if(j.err){no(new Error(j.err));return}if(fn==='getCollect'&&j.r&&j.r.frame){window.__FRAME=1;frame();return}ok(j.r)}).catch(function(e){no(e)})}});
+  o.getVer=function(){};return o}
+ window.google={script:{url:{getLocation:function(cb){var go=function(){if(!window.__FRAME)cb({parameter:{k:K}})};if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',go);else setTimeout(go,0)}}}};
+ Object.defineProperty(window.google.script,'run',{get:runner});
+})();
+</script>
+<style>
+:root{--bg:#f1f7ff;--card:#fff;--ink:#0f1c2e;--mut:#5b6f8a;--line:#d9e5f5;--ok:#1a7f4b;--okbg:#e3f5ec;--acc:#0b6cf0;--band:#0b6cf0;--zebra:#f4f8ff;--bad:#b42318}
+@media(prefers-color-scheme:dark){:root{--bg:#0d1520;--card:#142031;--ink:#e6eefb;--mut:#8fa6c4;--line:#233450;--ok:#4ade80;--okbg:#10301f;--acc:#4da3ff;--band:#1b4f9c;--zebra:#172639;--bad:#f87171}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:18px/1.35 system-ui,-apple-system,sans-serif}
+.top{position:sticky;top:0;z-index:5;background:var(--card);border-bottom:1px solid var(--line);padding:10px 14px 12px;box-shadow:0 2px 8px rgba(0,0,0,.08)}
+.t1{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}.inv{display:block;font-size:15px;font-weight:600;color:var(--mut);margin-top:1px}.flt{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:8px}.flt button{border:1px solid var(--acc);background:transparent;color:var(--acc);border-radius:999px;padding:7px 14px;font:inherit;font-size:14px;font-weight:700;cursor:pointer}.flt button.on{background:var(--acc);color:#fff}.flt small{font-size:12px;color:var(--mut)}body.uo .row.paid{display:none}body.uo section:not(:has(.row:not(.paid))):not(:has(.waitn)):not(:has(.apt)){display:none}body.uo .apt.paid{display:none}.cflt{margin-top:10px}.cflt button{font:inherit;font-size:14px;font-weight:700;border:0;border-radius:999px;padding:8px 16px;background:var(--acc);color:#fff;cursor:pointer}body.sc .top .bar,body.sc #per,body.sc #lg{display:none}body.sc .top .t1 b{font-size:16px}body.sc .top .t1 .inv{display:inline;font-size:14px;margin-inline-start:8px}body.sc .top .big{font-size:20px}body.sc .top .flt{margin-top:6px}.uoE{display:none;padding:26px 16px;text-align:center;color:var(--ok);font-weight:800}body.uo.alldone .uoE{display:block}.t1 b{font-size:22px;color:var(--acc)}.t1 span{color:var(--mut);font-size:13px;text-align:right}
+.big{font-size:27px;font-weight:800;margin-top:2px;font-variant-numeric:tabular-nums}.big small{font-size:14px;font-weight:600;color:var(--mut)}
+.bar{height:10px;background:var(--line);border-radius:6px;margin-top:8px;overflow:hidden}.bar i{display:block;height:100%;width:0;background:var(--ok);transition:width .25s}
+
+.sub #rem,.sub b.rd{color:#ef4444;font-size:19px;font-weight:800}.sub b.rz{color:#16a34a;font-size:19px;font-weight:800}
+.sub{display:flex;justify-content:space-between;color:var(--mut);font-size:14px;margin-top:6px;font-variant-numeric:tabular-nums}
+main{max-width:560px;margin:0 auto;padding:6px 10px 40px}
+.band{display:flex;justify-content:space-between;background:var(--band);color:#fff;font-weight:800;letter-spacing:.06em;padding:9px 12px;border-radius:8px 8px 0 0;margin-top:14px;font-variant-numeric:tabular-nums}
+.row{display:flex;align-items:center;gap:12px;padding:10px 12px;background:var(--card);border-bottom:1px solid var(--line);cursor:pointer;-webkit-tap-highlight-color:transparent;user-select:none}
+.row.z{background:var(--zebra)}
+.row .nm{flex:1;min-width:0}.row .am{font-weight:800;font-variant-numeric:tabular-nums}
+.row input{width:28px;height:28px;accent-color:var(--ok);flex:none;margin:0}
+.row.paid{background:var(--okbg)}.row.paid .nm{color:var(--mut);text-decoration:line-through}.row.paid .am{color:var(--ok)}
+.grand{display:flex;justify-content:space-between;margin-top:16px;background:var(--ink);color:var(--bg);font-weight:800;padding:12px;border-radius:8px;font-variant-numeric:tabular-nums}
+.lg{border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:8px;padding:4px 10px;font:inherit;font-size:14px;cursor:pointer;margin-inline-start:8px}
+.msg{padding:30px 16px;text-align:center;color:var(--mut)}.msg.err{color:var(--bad)}
+#toast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);background:var(--bad);color:#fff;padding:10px 16px;border-radius:8px;font-size:15px;display:none;z-index:9}
+#tabs{display:flex;gap:6px;padding:10px 12px 0;max-width:560px;margin:0 auto}#tabs button{flex:1;padding:10px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink);font-weight:700;font-size:15px;cursor:pointer}#tabs button.on{background:var(--band);color:#fff;border-color:var(--band)}.cst{font-size:12px;font-weight:700;margin-inline-start:10px}.apt{padding:10px 14px;border-bottom:1px solid var(--line);background:var(--card)}.apt.z2{background:var(--zebra)}.ah{display:flex;justify-content:space-between;gap:10px;font-weight:700}.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}.chip{border:1px solid var(--line);border-radius:999px;padding:7px 12px;font-size:13px;font-weight:600;background:var(--card);color:var(--ink);cursor:pointer;min-height:36px}.chip.on{background:var(--okbg);border-color:var(--ok);color:var(--ok)}.chip.on:before{content:"\2713 "}.brand{display:flex;align-items:center;gap:6px;font-size:11px;font-weight:700;letter-spacing:.05em;color:var(--acc,var(--b));margin-bottom:4px}.brandbar{padding:8px 14px 0}.brandbar .brand{margin:0}
+#tabs button{padding:10px 2px;font-size:14px;min-width:0;white-space:nowrap}
+</style></head><body>
+<div class="brandbar"><div class="brand"><svg viewBox="0 0 24 24" width="13" height="13" aria-hidden="true"><path d="M12 2.5C8 7.6 5.5 11 5.5 14.5a6.5 6.5 0 0 0 13 0C18.5 11 16 7.6 12 2.5z" fill="currentColor"/></svg><span>Our Building · بنايتنا</span></div></div>
+<nav id="tabs" style="display:none"><button id="tw"></button><button id="tbA"></button><button id="tbB"></button><button id="tbC"></button><button id="tbD"></button></nav>
+<div class="top" id="top" style="display:none">
+<div class="t1"><b id="ttl">Water bill</b><span><span id="per"></span><button class="lg" id="lg">العربية</button></span></div>
+<div class="big"><span id="got">0</span> <small id="lcol">LBP collected</small></div>
+<div class="bar"><i id="pb"></i></div>
+<div class="sub"><span id="cnt"></span><span><span id="lrem">Remaining</span> <b id="rem"></b></span></div>
+<div class="flt"><button id="uo"></button><small id="wl"></small></div>
+</div>
+<main><div id="list"><div class="msg">Loading…</div></div><div class="uoE" id="uoE"></div><div id="grand"></div></main>
+<main id="cmain" style="display:none"><div id="cpanel"></div></main>
+<div id="toast"></div>
+<script>(function(){var s=false;window.addEventListener('scroll',function(){var y=window.scrollY||0;if(!s&&y>120){s=true;document.body.classList.add('sc')}else if(s&&y<30){s=false;document.body.classList.remove('sc')}},{passive:true})})();</script>
+<script>
+var TOK='',D=null,busy={};
+function $(i){return document.getElementById(i)}
+function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+function num(s){return parseInt(String(s).replace(/[^0-9]/g,''),10)||0}
+function nf(n){return Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g,',')}
+function toast(t){var e=$('toast');e.textContent=t;e.style.display='block';setTimeout(function(){e.style.display='none'},3500)}
+function err(t){$('list').innerHTML='<div class="msg err">'+esc(t)+'</div>'}
+function render(){
+ var h='',open=false,z=0,noted=0,sum=0,got=0,n=0,np=0,grand='',cur='',tot={};
+ D.rows.forEach(function(r){if(r.k==='block')cur=r.n;else if(r.k==='total')tot[cur]=r.a});
+ D.rows.forEach(function(r,i){
+  if(r.k==='block'){if(open)h+='</section>';h+='<section><div class="band" style="'+bstyle(r.n)+'"><span>'+esc(bn(r.n))+'</span><span dir="ltr">'+esc(tot[r.n]||'')+'</span></div>';open=true;z=0;noted=0;return}
+  if(r.k==='total')return;
+  if(r.k==='grand'){grand=r.a;return}
+  if(r.hid){if(!noted){noted=1;h+='<div class="waitn" style="padding:16px 12px;color:#64748b;font-size:14px;text-align:center">'+(LANG==='ar'?'⏳ بانتظار تأكيد توزيع المبلغ بين الشقق في هذا المبنى':'⏳ Waiting for this block to confirm how the total is split between apartments')+'</div>'}return}
+  var p=D.paid[i]?1:0,a=num(r.a);sum+=a;n++;if(p){got+=a;np++}
+  h+='<div class="row'+(z++%2?' z':'')+(p?' paid':'')+'" data-i="'+i+'"><input type="checkbox"'+(p?' checked':'')+'><span class="nm">'+esc(r.n)+'</span><span class="am" dir="ltr">'+esc(r.a)+'</span></div>';
+ });
+ sum+=D.hidSum||0;
+ if(open)h+='</section>';
+ $('list').innerHTML=h;
+ $('grand').innerHTML=grand?'<div class="grand"><span>'+T('grand')+'</span><span dir="ltr">'+esc(grand)+'</span></div>':'';
+ fillTop({inv:D.inv,period:D.period,got:got,sum:sum,np:np,n:n});
+ $('top').style.display='block';
+}
+// The locked header: same look for the current invoice and the earlier ones.
+function fillTop(o){
+ $('per').innerHTML='<bdi>'+esc(perT(o.period||''))+'</bdi>';
+ $('ttl').innerHTML=esc(LANG==='ar'?'فاتورة المياه':'Water bill')+(o.inv?'<small class="inv">'+esc(o.inv)+(o.old?' · '+(LANG==='ar'?'سابقة':'earlier'):'')+'</small>':'');
+ $('got').textContent=nf(o.got);$('rem').textContent=nf(o.sum-o.got);$('rem').style.color=(o.sum-o.got>0?'':'#16a34a');$('cnt').textContent=T('paid',o.np,o.n);
+ $('pb').style.width=(o.sum?Math.min(100,o.got/o.sum*100):0)+'%';
+}
+function setP(i,v){
+ if(v)D.paid[i]=1;else delete D.paid[i];busy[i]=1;render();
+ google.script.run.withSuccessHandler(function(p){delete busy[i];D.paid=p;render()}).withFailureHandler(function(e){delete busy[i];if(v)delete D.paid[i];else D.paid[i]=1;render();toast(T('nosave'))}).setPaid(TOK,i,v);
+}
+$('list').onclick=function(e){var el=e.target.closest?e.target.closest('.row'):null;if(!el)return;if(e.target.tagName==='INPUT')e.preventDefault();var i=+el.getAttribute('data-i');setP(i,D.paid[i]?0:1)};
+function refresh(){if(!D||Object.keys(busy).length)return;google.script.run.withSuccessHandler(function(d){if(d&&!d.error&&!Object.keys(busy).length){D=d;render();try{keep(d)}catch(e){}}}).getCollect(TOK)}
+var LANG='en';try{LANG=localStorage.getItem('wc_lang')||((navigator.language||'').toLowerCase().indexOf('ar')===0?'ar':'en')}catch(e){}
+var I={en:{ttl:'Water bill',col:'LBP collected',rem:'Remaining',grand:'Total to Collect',missing:'Missing link',nosave:'Not saved, check your connection',btn:'العربية'},ar:{ttl:'فاتورة المياه',col:'ل.ل. تم تحصيلها',rem:'المتبقي',grand:'المجموع المطلوب تحصيله',missing:'الرابط غير مكتمل',nosave:'لم يتم الحفظ، تحقق من الاتصال',btn:'English'}};
+function T(k,a,b){if(k==='paid')return LANG==='ar'?('دفع '+a+' من '+b):(a+' of '+b+' paid');return I[LANG][k]}
+function TE(s){var m={'This link is no longer active':'هذا الرابط لم يعد صالحاً','No round has been published yet':'لم يتم نشر أي دورة بعد'};return LANG==='ar'&&m[s]?m[s]:s}
+function bstyle(n){var m=/Block\s*([A-D])/i.exec(n||''),k={A:'#e4572e',B:'#f2a900',C:'#0e9aa7',D:'#7b4fd1'}[m?m[1].toUpperCase():''];return k?'border-inline-start:6px solid '+k:''}
+function bn(s){var m=/^Block\s*(.*)$/i.exec(s);if(!m)return s;return LANG==='ar'?'مبنى '+m[1]:s.toUpperCase()}
+function perT(s){return LANG==='ar'?s.replace(' to ',' إلى '):s}
+function applyLang(){document.documentElement.lang=LANG;document.documentElement.dir=LANG==='ar'?'rtl':'ltr';$('ttl').textContent=T('ttl');$('lcol').textContent=T('col');$('lrem').textContent=T('rem');$('lg').textContent=T('btn');if(D)render()}
+$('lg').onclick=function(){LANG=LANG==='ar'?'en':'ar';try{localStorage.setItem('wc_lang',LANG)}catch(e){}applyLang()};
+applyLang();
+// Fast start: the server puts the data in the page (window.__INIT); the last list is also kept on the phone.
+function keep(d){try{localStorage.setItem('wc_last',JSON.stringify({t:TOK,d:d}))}catch(e){}}
+google.script.url.getLocation(function(loc){
+ TOK=(loc.parameter&&loc.parameter.k)||'';if(!TOK){err(T('missing'));return}
+ var I=window.__INIT;
+ if(I&&!I.error){D=I;render();keep(I);setInterval(refresh,30000);return}
+ if(I&&I.error){err(TE(I.error));return}
+ try{var c=JSON.parse(localStorage.getItem('wc_last')||'null');if(c&&c.t===TOK&&c.d){D=c.d;render()}}catch(e){}
+ google.script.run.withSuccessHandler(function(d){if(d.error){err(TE(d.error));return}D=d;render();keep(d);setInterval(refresh,30000)}).withFailureHandler(function(e){if(!D)err(e.message||String(e))}).getCollect(TOK);
+});
+
+/* ---- Building tabs (A, B, C, D) ---- */
+var TAB='w',CURB='C';
+function BL(){return CURB||'C'}
+function bldList(){var b=(D&&D.bld)||{};return ['A','B','C','D'].filter(function(L){return b[L]})}
+function pickB(){if(!D)return;if(!D.bld){D.bld={};if(D.blockc)D.bld.C=D.blockc}var ls=bldList();if(ls.indexOf(CURB)<0)CURB=ls[0]||'C';D.blockc=D.bld[CURB]||null}
+var CI={en:{w:'Water',c:'Block C',month:'Monthly maintenance',col:'USD collected',rem:'Remaining',bills:'Bills due',due:'Due',pd:'Paid',none:'No bills due',tot:'Total to Collect'},ar:{w:'المياه',c:'مبنى C',month:'الصيانة الشهرية',col:'دولار تم تحصيلها',rem:'المتبقي',bills:'الفواتير المستحقة',due:'مستحقة',pd:'مدفوعة',none:'لا توجد فواتير مستحقة',tot:'المجموع المطلوب تحصيله'}};
+function CT(k){if(k==='c')return LANG==='ar'?'مبنى '+BL():'Block '+BL();return CI[LANG][k]}
+ function arMon(s){var M={january:'كانون الثاني',february:'شباط',march:'آذار',april:'نيسان',may:'أيار',june:'حزيران',july:'تموز',august:'آب',september:'أيلول',october:'تشرين الأول',november:'تشرين الثاني',december:'كانون الأول'},x=/^\s*([A-Za-z]+)\s+(\d{4})/.exec(String(s||''));return x&&M[x[1].toLowerCase()]?M[x[1].toLowerCase()]+' '+x[2]:String(s||'')}
+ function usd(n){var x=Math.round(n*100)/100;return '$'+x.toLocaleString('en-US',{minimumFractionDigits:0,maximumFractionDigits:2})}
+function showTab(){pickB();var ls=bldList(),hasC=ls.length>0;$('tabs').style.display=hasC?'flex':'none';var onC=hasC&&TAB==='c';$('tw').className=onC?'':'on';$('tw').textContent=CT('w');['A','B','C','D'].forEach(function(L){var b=$('tb'+L);b.style.display=ls.indexOf(L)>=0?'':'none';b.className=(onC&&CURB===L)?'on':'';b.textContent=LANG==='ar'?'مبنى '+L:'Block '+L});$('cmain').style.display=onC?'block':'none';$('list').parentNode.style.display=onC?'none':'';if(onC)$('top').style.display='none';else if(D)$('top').style.display=''}
+CI.en.dcov='Dues covered';CI.ar.dcov='الالتزامات المغطاة';CI.en.dsec='Dues to cover';CI.ar.dsec='الالتزامات المطلوب تغطيتها';CI.en.bpool='Building bills';CI.ar.bpool='فواتير المبنى';CI.en.stl='settled';CI.ar.stl='سدّدوا';CI.en.bych='By charge';CI.ar.bych='حسب البند';
+function cname(c){return esc(LANG==='ar'&&c.la?c.la:c.l)}
+function ca(c,nm){return (c.ov&&c.ov[nm]!=null)?c.ov[nm]:c.a}
+function colSum(c){var t=0;((D&&D.blockc&&D.blockc.names)||[]).forEach(function(nm){t+=ca(c,nm)});return t}
+function renderC(){var bc=D&&D.blockc;if(!bc){$('cpanel').innerHTML='';return}
+ var cols=bc.cols||[],names=bc.names||[],pd=bc.paid||{},n=names.length;
+ function isP(c,nm){return !!(pd[c.pk]&&pd[c.pk][nm])}
+ var sum=0,got=0,settled=0;
+ cols.forEach(function(c){sum+=colSum(c);names.forEach(function(nm){if(isP(c,nm))got+=ca(c,nm)})});
+ names.forEach(function(nm){if(cols.length&&cols.every(function(c){return ca(c,nm)<=0||isP(c,nm)}))settled++});
+ var pct=sum?Math.round(got*100/sum):0;
+ var maintCol=cols.filter(function(c){return c.pk.indexOf('m:maint:')===0})[0];
+ function colGot(c){var k=0;names.forEach(function(nm){if(isP(c,nm))k+=ca(c,nm)});return k}
+ var B=0;(bc.bills||[]).forEach(function(b){B+=b.a});
+ var dr=[];
+ if(B>0)dr.push({l:CT('bpool'),req:B,got:maintCol?Math.min(colGot(maintCol),B):0});
+ cols.forEach(function(c){if(c===maintCol)return;dr.push({l:cname(c),req:colSum(c),got:colGot(c),math:(c.ov&&Object.keys(c.ov).length)?'':usd(c.a)+' \u00d7 '+n})});
+ var dreq=0,dgot=0;dr.forEach(function(r){dreq+=r.req;dgot+=r.got});var dp=dreq?Math.round(dgot*100/dreq):0;
+ var cnt=LANG==='ar'?('سدّد '+settled+' من '+n):(settled+' of '+n+' '+CT('stl'));
+ var h='<div class="top"><div class="t1"><b>'+esc(CT('c'))+'</b><span><bdi>'+esc(bc.month)+'</bdi></span></div><div class="big"><span dir="ltr">'+usd(got)+'</span> <small>'+CT('col')+'</small></div><div class="bar"><i style="width:'+pct+'%"></i></div><div class="sub"><span>'+cnt+'</span><span>'+CT('rem')+' <b dir="ltr" class="'+(sum-got>0?'rd':'rz')+'">'+usd(sum-got)+'</b></span></div>'+(dr.length?'<div class="sub" style="margin-top:8px"><span>'+CT('dcov')+'</span><span dir="ltr"><b>'+usd(dgot)+'</b> / '+usd(dreq)+'</span></div><div class="bar"><i style="width:'+dp+'%"></i></div>':'')+'<div class="cflt"><button id="cuo">'+esc(($('uo')&&$('uo').textContent)||'')+'</button></div></div>';
+ if(false){h+='<section style="margin-bottom:14px"><div class="band"><span>'+CT('dsec')+'</span><span dir="ltr">'+usd(dreq)+'</span></div>';dr.forEach(function(r,i){h+='<div class="row'+(i%2?' z2':'')+(r.got>=r.req?' paid':'')+'"><span class="nm">'+r.l+(r.math?' <small style="color:var(--mut)" dir="ltr">'+r.math+'</small>':'')+'</span><span class="am" dir="ltr">'+usd(r.got)+' / '+usd(r.req)+'</span></div>'});h+='</section>'}
+ h+='<section><div class="band" style="'+bstyle('Block '+BL())+'"><span>'+esc(CT('c'))+'</span><span dir="ltr">'+usd(sum)+'</span></div>';
+ names.forEach(function(nm,i){var owed=0;cols.forEach(function(c){if(!isP(c,nm))owed+=ca(c,nm)});
+  h+='<div class="apt'+(i%2?' z2':'')+(owed>0?'':' paid')+'"><div class="ah"><span class="nm">'+esc(nm)+(bc.nameAr&&bc.nameAr[nm]?' <bdi><small style="color:var(--mut)">'+esc(bc.nameAr[nm])+'</small></bdi>':'')+'</span><span class="am" dir="ltr" style="color:var(--'+(owed>0?'bad':'ok')+')">'+(owed>0?usd(owed):'\u2713')+'</span></div><div class="chips">'+cols.map(function(c,ci){if(!(ca(c,nm)>0))return '';return '<button class="chip'+(isP(c,nm)?' on':'')+'" data-c="'+ci+'" data-n="'+i+'">'+cname(c)+' <span dir="ltr">'+usd(ca(c,nm))+'</span></button>'}).join('')+'</div></div>'});
+ h+='</section>';
+ if(cols.length){h+='<section style="margin-top:14px"><div class="band"><span>'+CT('bych')+'</span><span></span></div>';
+  cols.forEach(function(c,i){var k=0;names.forEach(function(nm){if(isP(c,nm))k++});var mh=(c===maintCol)?(B>0?usd(B)+' '+(LANG==='ar'?'للفواتير':'for bills'):''):((c.ov&&Object.keys(c.ov).length)?'':usd(c.a)+' \u00d7 '+n);h+='<div class="row'+(i%2?' z2':'')+'"><span class="nm">'+cname(c)+(mh?' <small style="color:var(--mut)" dir="ltr">'+mh+'</small>':'')+'</span><span class="am" dir="ltr">'+usd(colGot(c))+' / '+usd(colSum(c))+'</span></div>'});
+  h+='</section>'}
+ var bl=bc.bills||[];h+='<section style="margin-top:14px"><div class="band"><span>'+CT('bills')+'</span><span></span></div>';
+ if(!bl.length)h+='<div class="msg">'+CT('none')+'</div>';
+ bl.forEach(function(b,i){h+='<div class="row'+(i%2?' z2':'')+'"><span class="nm">'+esc(LANG==='ar'&&b.la?b.la:b.l)+'</span><span class="am" dir="ltr">'+usd(b.a)+'</span><span class="cst" style="color:var(--'+(b.p?'ok':'bad')+')">'+(b.p?CT('pd'):CT('due'))+'</span></div>'});
+ h+='</section>';
+ $('cpanel').innerHTML=h;
+ if($('cuo'))$('cuo').onclick=function(){$('uo').click();renderC()};Array.prototype.forEach.call($('cpanel').querySelectorAll('button.chip'),function(el){el.onclick=function(){tickX(+el.getAttribute('data-c'),+el.getAttribute('data-n'))}})}
+function tickX(ci,ni){var bc=D.blockc,c=bc.cols[ci],nm=bc.names[ni],k='c'+ci+'_'+ni;if(busy[k])return;
+ if(!bc.paid[c.pk]||typeof bc.paid[c.pk]!=='object')bc.paid[c.pk]={};
+ var v=!bc.paid[c.pk][nm];busy[k]=1;if(v)bc.paid[c.pk][nm]=true;else delete bc.paid[c.pk][nm];renderC();
+ function undo(){if(v)delete bc.paid[c.pk][nm];else bc.paid[c.pk][nm]=true;renderC()}
+ google.script.run.withSuccessHandler(function(r){delete busy[k];if(!r||r.error){undo();toast(T('nosave'));return}D.blockc.paid[c.pk]=r;renderC()}).withFailureHandler(function(){delete busy[k];undo();toast(T('nosave'))}).setPaidX(TOK,c.pk,nm,v,BL())}
+var _render=render;render=function(){_render();if(D){showTab();renderC()}};
+$('tw').onclick=function(){TAB='w';showTab();window.scrollTo(0,0)};
+['A','B','C','D'].forEach(function(L){$('tb'+L).onclick=function(){TAB='c';CURB=L;showTab();renderC();window.scrollTo(0,0)}});
+
+// ---- invoices: tabs for the current round and earlier rounds still open; paid-amount differences ----
+(function(){
+var css=document.createElement('style');css.textContent='body.uo .row.paid.df{display:flex}.dfb{display:block;text-decoration:none;margin-top:4px;font-weight:700;font-size:12px;cursor:pointer}#rsw{display:grid;grid-template-columns:repeat(auto-fit,minmax(70px,1fr));gap:6px;padding:0 0 10px;margin-bottom:8px;border-bottom:1px solid var(--line)}#rsw button{min-width:0;border-radius:12px;padding:6px 4px;font:inherit;font-size:15px;font-weight:800;line-height:1.15;cursor:pointer;text-align:center}#rsw button small{display:block;font-size:11px;font-weight:600;opacity:.8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}body.sc #rsw{padding-bottom:6px;margin-bottom:6px}body.sc #rsw button{padding:4px}';document.head.appendChild(css);
+var _r2=render;
+render=function(){_r2.apply(this,arguments);try{renderHist()}catch(e){}};
+var SEL=null;
+function dfb(d,h,i){var ar=LANG==='ar',t=d>0?(ar?'مطلوب إضافي ':'To collect +')+nf(d):(ar?'للإرجاع ':'To return ')+nf(-d);return '<small class="dfb" data-dh="'+h+'" data-di="'+i+'" style="color:'+(d>0?'var(--bad)':'#b45309')+'">'+(d>0?'⬆ ':'⬇ ')+t+' · '+(ar?'اضغط عند التسوية':'tap when settled')+'</small>'}
+function curBadges(){Array.prototype.forEach.call($('list').querySelectorAll('.row[data-i]:not([data-h])'),function(el){var i=+el.getAttribute('data-i'),d=D.diff&&D.diff[i];if(d){el.classList.add('df');var nm=el.querySelector('.nm');if(nm)nm.insertAdjacentHTML('beforeend',dfb(d,'c',i))}})}
+function renderHist(){
+ if(!D)return;
+ var ar=LANG==='ar',sw=$('rsw');
+ if(!D.hv){D.hv=[];(D.hist||[]).forEach(function(r,hi){var un=0;(r.rows||[]).forEach(function(x,i){if(x.k!=='block'&&x.k!=='total'&&x.k!=='grand'&&!(r.paid&&r.paid[i]))un++});if(un||Object.keys(r.diff||{}).length)D.hv.push(hi)})}
+ var hv=D.hv,cur=!D.curHidden;
+ if(!sw){sw=document.createElement('div');sw.id='rsw';sw.onclick=function(e){var b=e.target.closest?e.target.closest('button'):null;if(!b)return;var s=+b.getAttribute('data-s');if(s===SEL)return;SEL=s;render();window.scrollTo(0,0)};var tp=$('top');tp.insertBefore(sw,tp.firstChild)}
+ if(SEL!==null&&SEL!==-1&&hv.indexOf(SEL)<0)SEL=null;
+ if(SEL===-1&&!cur)SEL=null;
+ if(SEL===null)SEL=cur?-1:(hv.length?hv[0]:-1);
+ function left(r){var n=0,s=0;(r.rows||[]).forEach(function(x,i){if(x.k==='block'||x.k==='total'||x.k==='grand'||x.hid)return;if(!(r.paid&&r.paid[i])){n++;s+=num(x.a)}});return {n:n,s:s}}
+ function pill(s,t){var on=SEL===s;return '<button data-s="'+s+'" style="border:1px solid '+(on?'var(--band)':'var(--line)')+';background:'+(on?'var(--band)':'var(--card)')+';color:'+(on?'#fff':'var(--ink)')+'">'+t+'</button>'}
+ function lab(no,n,c){var k=n?(ar?n+' متبقٍ':n+' left'):'✓';return '<span dir="ltr">'+esc(no)+'</span><small>'+(c?(ar?'الحالية · ':'Current · '):'')+k+'</small>'}
+ var ph=cur?pill(-1,lab(D.inv||(ar?'الحالية':'Current'),left(D).n,1)):'';
+ hv.forEach(function(hi){var r=D.hist[hi];ph+=pill(hi,lab(r.inv||r.period||'',left(r).n,0))});
+ sw.innerHTML=ph;sw.style.display=((cur?1:0)+hv.length)>1?'flex':'none';
+ if(SEL===-1&&cur){$('grand').style.display='';$('uoE').style.display='';curBadges();return}
+ if(SEL===-1){$('list').innerHTML='<div class="msg">'+(ar?'لا توجد فواتير مياه مفتوحة حالياً':'No open water invoices right now')+'</div>';$('grand').style.display='none';$('uoE').style.display='none';$('top').style.display='none';return}
+ var r=D.hist[SEL],df=r.diff||{},h='',open=false,z=0,sum=0,got=0,n=0,np=0,grand='',tt={},cb='';
+ (r.rows||[]).forEach(function(x){if(x.k==='block')cb=x.n;else if(x.k==='total')tt[cb]=x.a});
+ (r.rows||[]).forEach(function(x,i){
+  if(x.k==='block'){if(open)h+='</section>';h+='<section><div class="band" style="'+bstyle(x.n)+'"><span>'+esc(bn(x.n))+'</span><span dir="ltr">'+esc(tt[x.n]||'')+'</span></div>';open=true;z=0;return}
+  if(x.k==='total')return;
+  if(x.k==='grand'){grand=x.a;return}
+  var p=r.paid&&r.paid[i]?1:0,d=p&&df[i],a=num(x.a);sum+=a;n++;if(p){got+=a;np++}
+  h+='<div class="row'+(z++%2?' z':'')+(p?' paid':'')+(d?' df':'')+'" data-h="'+SEL+'" data-i="'+i+'"><input type="checkbox"'+(p?' checked':'')+'><span class="nm">'+esc(x.n)+(d?dfb(d,SEL,i):'')+'</span><span class="am" dir="ltr">'+esc(x.a)+'</span></div>'});
+ if(open)h+='</section>';
+ $('list').innerHTML=h;
+ $('grand').innerHTML=grand?'<div class="grand"><span>'+T('grand')+'</span><span dir="ltr">'+esc(grand)+'</span></div>':'';
+ $('grand').style.display='';$('uoE').style.display='';
+ fillTop({inv:r.inv,period:r.period,got:got,sum:sum,np:np,n:n,old:1});$('top').style.display='block';
+}
+function setH(hi,i){var r=D.hist[hi];r.paid=r.paid||{};var v=!r.paid[i];if(v)r.paid[i]=1;else delete r.paid[i];if(r.diff)delete r.diff[i];render();
+ google.script.run.withSuccessHandler(function(p){r.paid=p||{};render()}).withFailureHandler(function(){if(v)delete r.paid[i];else r.paid[i]=1;render();toast(T('nosave'))}).setPaidH(TOK,r.inv,i,v?1:0)}
+function setD(el){var h=el.getAttribute('data-dh'),i=+el.getAttribute('data-di'),ro=h==='c'?D:D.hist[+h];if(!ro)return;
+ if(!confirm(LANG==='ar'?'هل تمت تسوية الفرق؟':'Mark this difference as settled?'))return;
+ google.script.run.withSuccessHandler(function(m){ro.diff=m||{};render()}).withFailureHandler(function(e){toast((e&&e.message)||T('nosave'))}).setDiffOk(TOK,ro.inv||'',i)}
+$('list').onclick=function(e){var db=e.target.closest?e.target.closest('.dfb'):null;if(db){e.preventDefault();setD(db);return}
+ var el=e.target.closest?e.target.closest('.row'):null;if(!el)return;if(e.target.tagName==='INPUT')e.preventDefault();var i=+el.getAttribute('data-i');
+ if(el.hasAttribute('data-h')){setH(+el.getAttribute('data-h'),i)}else{if(D.diff)delete D.diff[i];setP(i,D.paid[i]?0:1)}};
+})();
+</script>
+<script>
+/* Announce a person's bill on WhatsApp (opens a prefilled chat; Anas taps Send). Arabic first, then English. */
+(function(){
+ var css=document.createElement('style');css.textContent='.wa{margin-inline-start:6px;padding:8px 6px;text-decoration:none;font-size:19px;line-height:1;flex:none}.row.paid .wa{opacity:.45}';document.head.appendChild(css);
+ function link(ph,msg){return 'https://wa.me/'+ph+'?text='+encodeURIComponent(msg)}
+ function mk(href){var a=document.createElement('a');a.className='wa';a.href=href;a.target='_blank';a.rel='noopener';a.title='WhatsApp';a.textContent='📣';return a}
+ var HI_W='💧 *فاتورة المياه · Water Invoice*', HI_B='🏢 *فاتورة البلوك C\u200F · Block C Invoice*', HR_W='🧾 *إيصال المياه · Water Receipt*', HR_B='🧾 *إيصال البلوك C\u200F · Block C Receipt*';
+ var NOTE='────────────────────\n_ملاحظة: هذه رسالة تلقائية. لأي استفسار أو تعديل، يُرجى الرد مباشرة عبر هذه المحادثة._\n_Note: This is an automated message. For any questions or corrections, please reply directly to this chat._\n\n💧 *بنايتنا · Our Building*';
+ function wrap(ar,en){var rc=ar.indexOf('إيصال استلام')>-1,bk=ar.indexOf('البلوك C')>-1,HDR=rc?(bk?HR_B:HR_W):(bk?HI_B:HI_W);var t=HDR+'\n\n'+ar+'\n\n'+en+'\n\n'+NOTE;return (bk&&BL()!=='C')?t.replace(/البلوك C/g,'البلوك '+BL()).replace(/Block C/g,'Block '+BL()):t}
+ function waterMsg(r,per){var p=per||D.period||'';
+  if(!(num(r.a)>0))return wrap('تحية طيبة *'+r.n+'*، 👋\n\nبلغت قيمة فاتورة المياه الخاصة بكم للفترة *'+p.replace(' to ',' إلى ')+'* ما مجموعه *0 ل.ل.* 💧 — لا يترتب عليكم أي مبلغ في هذه الدورة. 🎉\n\nنشكر لكم حسن تعاونكم معنا! 🙏✨','Hello *'+r.n+'*, 👋\n\nYour water bill for the period *'+p+'* comes out to *0 LBP* 💧 — you have nothing to pay this round. 🎉\n\nThank you for your valued cooperation! 🙏✨');
+  return wrap('تحية طيبة *'+r.n+'*، 👋\n\nبلغت قيمة فاتورة المياه الخاصة بكم للفترة *'+p.replace(' to ',' إلى ')+'* ما مجموعه *'+r.a+' ل.ل.* 📊💧.\n\n👉 *يُرجى تسديد هذا المبلغ وتسليمه إلى أنس.*\n\nنشكر لكم حسن تعاونكم معنا! 🙏✨','Hello *'+r.n+'*, 👋\n\nYour water bill for the period *'+p+'* comes out to a total of *'+r.a+' LBP* 📊💧.\n\n👉 *Please settle this amount by passing it to Anas.*\n\nThank you for your valued cooperation! 🙏✨')}
+ function arMon(s){var M={january:'كانون الثاني',february:'شباط',march:'آذار',april:'نيسان',may:'أيار',june:'حزيران',july:'تموز',august:'آب',september:'أيلول',october:'تشرين الأول',november:'تشرين الثاني',december:'كانون الأول'},x=/^\s*([A-Za-z]+)\s+(\d{4})/.exec(String(s||''));return x&&M[x[1].toLowerCase()]?M[x[1].toLowerCase()]+' '+x[2]:String(s||'')}
+ function usd(x){return '$'+(Math.round(x*100)/100)}
+ function bcMsg(bc,nm){var cols=bc.cols||[],pd=bc.paid||{},en='',ar='',due=0,an=(bc.nameAr&&bc.nameAr[nm])||nm;
+  cols.forEach(function(c){var a=(c.ov&&c.ov[nm]!=null)?c.ov[nm]:c.a;if(!(a>0))return;var p=pd[c.pk]&&pd[c.pk][nm];en+='• '+c.l+': '+usd(a)+(p?' ✅':'')+'\n';ar+='• '+(c.la||c.l)+': '+usd(a)+(p?' ✅':'')+'\n';if(!p)due+=a});
+  if(!(due>0))return wrap('تحية طيبة *'+an+'*، 👋\n\nالبلوك C\u200F · *'+arMon(bc.month)+'*\n\nلا يترتب عليكم أي مبلغ هذا الشهر — كل شيء مسدّد. ✅\n\nنشكر لكم حسن تعاونكم معنا! 🙏✨','Hello *'+nm+'*, 👋\n\nBlock C · *'+bc.month+'*\n\nYou have nothing to pay this month — all settled. ✅\n\nThank you for your valued cooperation! 🙏✨');
+  return wrap('تحية طيبة *'+an+'*، 👋\n\nالبلوك C\u200F · *'+arMon(bc.month)+'*\n'+ar+'\n👉 *المبلغ المستحق: '+usd(due)+' — يُرجى تسليمه إلى أنس.*\n\nنشكر لكم حسن تعاونكم معنا! 🙏✨','Hello *'+nm+'*, 👋\n\nBlock C · *'+bc.month+'*\n'+en+'\n👉 *Total due: '+usd(due)+' — please pass it to Anas.*\n\nThank you for your valued cooperation! 🙏✨')}
+ window.annAdd=function(){try{
+  if(!window.D)return;
+  document.querySelectorAll('#list .row[data-i]').forEach(function(el){if(el.querySelector('.wa'))return;var hh=el.getAttribute('data-h'),ro=hh!=null?(D.hist||[])[+hh]:D,r=ro&&ro.rows&&ro.rows[+el.getAttribute('data-i')];if(!r||String(r.a).trim()==='')return;
+   var ph=r.ph;if(!ph)(D.rows||[]).forEach(function(x){if(!ph&&x.k==='apt'&&x.ph&&((r.id&&x.id===r.id)||x.n===r.n))ph=x.ph});
+   if(ph)el.appendChild(mk(link(ph,waterMsg(r,ro.period))))});
+  var bc=D.blockc;if(bc&&bc.phones){var cards=document.querySelectorAll('#cpanel .apt');(bc.names||[]).forEach(function(nm,i){var el=cards[i];if(!el||el.querySelector('.wa'))return;var ph=bc.phones[nm];if(!ph)return;var h=el.querySelector('.ah');(h||el).appendChild(mk(link(ph,bcMsg(bc,nm))))})}
+ }catch(e){}};
+ document.addEventListener('click',function(e){if(e.target.closest&&e.target.closest('.wa'))e.stopPropagation()},true);
+ ['render','renderC'].forEach(function(n){var o=window[n];if(typeof o!=='function')return;window[n]=function(){var r=o.apply(this,arguments);annAdd();return r}});
+ annAdd();
+})();
+</script>
+<script>
+(function(){var on=false;try{on=localStorage.getItem('wc_uo')==='1'}catch(e){}
+function L(){return document.documentElement.lang==='ar'}
+function upd(){var b=document.getElementById('uo');if(!b)return;document.body.classList.toggle('uo',on);b.className=on?'on':'';b.textContent=on?(L()?'عرض الكل':'Show all'):(L()?'غير المدفوعين فقط':'Unpaid only');
+ document.getElementById('wl').textContent=L()?'📣 = إرسال تذكير واتساب':'📣 = send WhatsApp reminder';
+ var rows=document.querySelectorAll('#list .row:not(.paid)');document.body.classList.toggle('alldone',on&&!rows.length);document.getElementById('uoE').textContent=L()?'الجميع دفع ✅':'Everyone has paid ✅'}
+document.getElementById('uo').onclick=function(){on=!on;try{localStorage.setItem('wc_uo',on?'1':'0')}catch(e){}upd()};
+document.getElementById('lg').addEventListener('click',function(){setTimeout(upd,0)});
+var o=window.render;if(typeof o==='function'){window.render=function(){var r=o.apply(this,arguments);upd();return r}}
+upd()})();
+</script>
+<script>
+/* Receipt button: Anas taps 🧾 on a paid person and WhatsApp opens with a receipt
+   (Arabic first, then English) saying what was paid and what is still left. */
+(function(){
+ var css=document.createElement('style');
+ css.textContent='.rc{margin-inline-start:2px;padding:8px 6px;text-decoration:none;font-size:19px;line-height:1;flex:none}';
+ document.head.appendChild(css);
+
+ var HI_W='💧 *فاتورة المياه · Water Invoice*', HI_B='🏢 *فاتورة البلوك C\u200F · Block C Invoice*', HR_W='🧾 *إيصال المياه · Water Receipt*', HR_B='🧾 *إيصال البلوك C\u200F · Block C Receipt*';
+ var NOTE='────────────────\n_ملاحظة: هذه رسالة تلقائية. لأي استفسار أو تعديل، يُرجى الرد مباشرة عبر هذه المحادثة._\n_Note: This is an automated message. For any questions or corrections, please reply directly to this chat._\n\n💧 *بنايتنا · Our Building*';
+ function num(s){return parseInt(String(s).replace(/[^0-9]/g,''),10)||0}
+ function nf(n){return Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g,',')}
+ function arMon(s){var M={january:'كانون الثاني',february:'شباط',march:'آذار',april:'نيسان',may:'أيار',june:'حزيران',july:'تموز',august:'آب',september:'أيلول',october:'تشرين الأول',november:'تشرين الثاني',december:'كانون الأول'},x=/^\s*([A-Za-z]+)\s+(\d{4})/.exec(String(s||''));return x&&M[x[1].toLowerCase()]?M[x[1].toLowerCase()]+' '+x[2]:String(s||'')}
+ function usd(x){return '$'+(Math.round(x*100)/100)}
+ function link(ph,msg){return 'https://wa.me/'+ph+'?text='+encodeURIComponent(msg)}
+ function wrap(ar,en){var rc=ar.indexOf('إيصال استلام')>-1,bk=ar.indexOf('البلوك C')>-1,HDR=rc?(bk?HR_B:HR_W):(bk?HI_B:HI_W);var t=HDR+'\n\n'+ar+'\n\n'+en+'\n\n'+NOTE;return (bk&&BL()!=='C')?t.replace(/البلوك C/g,'البلوك '+BL()).replace(/Block C/g,'Block '+BL()):t}
+ function mk(href){var a=document.createElement('a');a.className='rc';a.href=href;a.target='_blank';a.rel='noopener';a.title='Receipt';a.textContent='🧾';return a}
+
+ /* ---------- Water ---------- */
+ function same(x,r){return (r.id&&x.id===r.id)||x.n===r.n}
+ function phoneOf(r){
+  if(r.ph&&String(r.ph).trim()!=='')return r.ph;
+  var f=''; (D.rows||[]).forEach(function(x){if(!f&&x.k==='apt'&&x.ph&&same(x,r))f=x.ph}); return f;
+ }
+ /* everything this person still owes: other meters this round + earlier rounds */
+ function leftWater(r,ro,idx){
+  var out=[], rounds=[D].concat(D.hist||[]);
+  rounds.forEach(function(rd){
+   (rd.rows||[]).forEach(function(x,i){
+    if(x.k!=='apt'||!same(x,r)||(rd===ro&&i===idx))return;
+    var a=num(x.a);
+    if(a>0&&!(rd.paid&&rd.paid[i]))out.push({p:rd.period||'',a:a});
+   });
+  });
+  return out;
+ }
+ function waterRc(r,ro,idx){
+  var p=ro.period||'', a=num(r.a), left=leftWater(r,ro,idx), sum=0, lar='', len='';
+  left.forEach(function(x){sum+=x.a;lar+='• '+x.p+': '+nf(x.a)+' ل.ل.\n';len+='• '+x.p+': '+nf(x.a)+' LBP\n'});
+  var ar='تحية طيبة *'+r.n+'*، 👋\n\n✅ *إيصال استلام* — وصلنا منكم *'+nf(a)+' ل.ل.* عن فاتورة المياه للفترة *'+p.replace(' to ',' إلى ')+'*. 💧\n\n'
+   +(sum?'⚠️ *المتبقي عليكم:*\n'+lar+'*المجموع: '+nf(sum)+' ل.ل.*\n\nيُرجى تسديده عند الإمكان.':'🎉 لا يوجد أي مبلغ متبقٍّ عليكم — كل شيء مسدَّد.')
+   +'\n\nنشكر لكم حسن تعاونكم معنا! 🙏✨';
+  var en='Hello *'+r.n+'*, 👋\n\n✅ *Payment receipt* — we received *'+nf(a)+' LBP* for the water bill of the period *'+p+'*. 💧\n\n'
+   +(sum?'⚠️ *Still remaining:*\n'+len+'*Total: '+nf(sum)+' LBP*\n\nPlease settle it when you can.':'🎉 Nothing is left to pay — you are all settled.')
+   +'\n\nThank you for your valued cooperation! 🙏✨';
+  return wrap(ar,en);
+ }
+
+ /* ---------- Block C ---------- */
+ function bcRc(bc,nm){
+  var cols=bc.cols||[], pd=bc.paid||{}, an=(bc.nameAr&&bc.nameAr[nm])||nm;
+  var pA='',pE='',lA='',lE='',tp=0,tl=0;
+  cols.forEach(function(c){
+   var a=(c.ov&&c.ov[nm]!=null)?c.ov[nm]:c.a;
+   if(!(a>0))return;
+   var ar=c.la||c.l, en=c.l;
+   if(pd[c.pk]&&pd[c.pk][nm]){tp+=a;pA+='• '+ar+': '+usd(a)+' ✅\n';pE+='• '+en+': '+usd(a)+' ✅\n'}
+   else{tl+=a;lA+='• '+ar+': '+usd(a)+'\n';lE+='• '+en+': '+usd(a)+'\n'}
+  });
+  if(!(tp>0))return null;
+  var ar='تحية طيبة *'+an+'*، 👋\n\nالبلوك C\u200F · *'+arMon(bc.month)+'*\n\n✅ *إيصال استلام* — وصلنا منكم *'+usd(tp)+'*:\n'+pA+'\n'
+   +(tl>0?'⚠️ *المتبقي عليكم:*\n'+lA+'*المجموع: '+usd(tl)+'*\n\nيُرجى تسليمه إلى أنس.':'🎉 لا يوجد أي مبلغ متبقٍّ عليكم — كل شيء مسدَّد.')
+   +'\n\nنشكر لكم حسن تعاونكم معنا! 🙏✨';
+  var en='Hello *'+nm+'*, 👋\n\nBlock C · *'+bc.month+'*\n\n✅ *Payment receipt* — we received *'+usd(tp)+'*:\n'+pE+'\n'
+   +(tl>0?'⚠️ *Still remaining:*\n'+lE+'*Total: '+usd(tl)+'*\n\nPlease pass it to Anas.':'🎉 Nothing is left to pay — you are all settled.')
+   +'\n\nThank you for your valued cooperation! 🙏✨';
+  return wrap(ar,en);
+ }
+
+ /* ---------- put the buttons on the page ---------- */
+ function addRc(){try{
+  if(!window.D)return;
+  document.querySelectorAll('#list .row[data-i]').forEach(function(el){
+   if(el.querySelector('.rc')||!el.classList.contains('paid'))return;
+   var i=+el.getAttribute('data-i'), h=el.getAttribute('data-h');
+   var ro=(h!=null)?(D.hist||[])[+h]:D, r=ro&&ro.rows&&ro.rows[i];
+   if(!r||r.k!=='apt'||!(num(r.a)>0))return;
+   var ph=phoneOf(r); if(!ph)return;
+   el.appendChild(mk(link(ph,waterRc(r,ro,i))));
+  });
+  var bc=D.blockc;
+  if(bc&&bc.phones){
+   var cards=document.querySelectorAll('#cpanel .apt');
+   (bc.names||[]).forEach(function(nm,i){
+    var el=cards[i]; if(!el||el.querySelector('.rc'))return;
+    var ph=bc.phones[nm]; if(!ph)return;
+    var m=bcRc(bc,nm); if(!m)return;
+    (el.querySelector('.ah')||el).appendChild(mk(link(ph,m)));
+   });
+  }
+ }catch(e){}}
+
+ /* tapping 🧾 must not tick/untick the row */
+ document.addEventListener('click',function(e){if(e.target.closest&&e.target.closest('.rc'))e.stopPropagation()},true);
+ ['render','renderC'].forEach(function(n){
+  var o=window[n]; if(typeof o!=='function')return;
+  window[n]=function(){var r=o.apply(this,arguments);addRc();return r};
+ });
+ addRc();
+})();
+</script>
+<script>
+/* auto-update: when a newer version of this page is on GitHub, offer a reload */
+(function(){
+ var shown=false;
+ function bar(){
+  if(shown)return; shown=true;
+  var b=document.createElement('div'); b.id='upd_bar';
+  b.style.cssText='position:fixed;left:0;right:0;bottom:0;z-index:99999;background:#1f6feb;color:#fff;padding:14px 16px;text-align:center;font:600 16px system-ui,sans-serif;cursor:pointer;box-shadow:0 -2px 10px rgba(0,0,0,.25)';
+  b.innerHTML='🔄 تحديث جديد — اضغط للتحديث<br><span style="font-weight:400;font-size:14px">New version — tap to update</span>';
+  b.onclick=function(){location.reload()};
+  document.body.appendChild(b);
+ }
+ function chk(){if(shown)return;fetch('./?appv='+Date.now(),{cache:'no-store'}).then(function(r){return r.text()}).then(function(t){if(t.indexOf("APPV='"+APPV+"'")<0&&/APPV='/.test(t))bar()}).catch(function(){})}
+ setInterval(chk,300000);
+ document.addEventListener('visibilitychange',function(){if(!document.hidden)chk()});
+})();
+</script>
+</body></html>
