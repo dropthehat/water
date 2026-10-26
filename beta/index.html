@@ -22,12 +22,12 @@
 /* Anas's page now lives here on GitHub; Apps Script ("Water Collect") only sends and saves the data.
    This small adapter gives the page the same google.script.run / google.script.url calls it used inside Apps Script,
    so the page code below is unchanged. A building rep's link (Block A split, Block B/C/D pages) still opens the Apps Script page. */
-var APPV='2026-10-26a';
+var APPV='2026-10-26b';
 (function(){
  var EXEC='https://script.google.com/macros/s/AKfycbw1_923NlIrccRTfiNBTDzs8SxX4hmMlSNWHFu68kxA6pFHV9X3eIeBUu0tRy35EGwx4Q/exec';
  var P=new URLSearchParams(location.search),K=P.get('k')||'',V=P.get('v')||'';
  function frame(){var f=document.createElement('iframe');f.src=EXEC+(K?'?k='+encodeURIComponent(K)+(V?'&v='+encodeURIComponent(V):''):'');f.style.cssText='position:fixed;top:0;left:0;width:100%;height:100%;border:0;background:#fff;z-index:99999';document.body.appendChild(f)}
- if(V){window.__FRAME=1;document.addEventListener('DOMContentLoaded',frame);}
+ if(V==='rep'){window.__FRAME=1;document.addEventListener('DOMContentLoaded',frame);}   // only the Block A charges link uses v=rep; other v values (old update links) open this page
  function call(fn,args){return fetch(EXEC,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'rpc',fn:fn,args:args}),redirect:'follow'}).then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.json()})}
  function runner(){var ok=function(){},no=function(){},o={withSuccessHandler:function(f){ok=f;return o},withFailureHandler:function(f){no=f;return o}};
   ['getCollect','setPaid','setPaidH','setPaidX','setDiffOk'].forEach(function(fn){o[fn]=function(){
