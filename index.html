@@ -21,7 +21,7 @@
 /* Anas's page now lives here on GitHub; Apps Script ("Water Collect") only sends and saves the data.
    This small adapter gives the page the same google.script.run / google.script.url calls it used inside Apps Script,
    so the page code below is unchanged. A building rep's link (Block A split, Block B/C/D pages) still opens the Apps Script page. */
-var APPV='2026-10-29c';
+var APPV='2026-10-29d';
 (function(){
  var EXEC='https://script.google.com/macros/s/AKfycbw0aOri7KloAq29a1Mksi3w-JlOoP4EgYUpoBJlwdqmgKVh72xGGPlxY0j9SGYUIqnJUw/exec';
  var P=new URLSearchParams(location.search),K=P.get('k')||'',V=P.get('v')||'';
@@ -63,7 +63,7 @@ main{max-width:560px;margin:0 auto;padding:6px 10px 40px}
 #tabs button{padding:10px 2px;font-size:14px;min-width:0;white-space:nowrap}
 </style></head><body>
 <div class="brandbar"><div class="brand"><svg viewBox="0 0 24 24" width="13" height="13" aria-hidden="true"><path d="M12 2.5C8 7.6 5.5 11 5.5 14.5a6.5 6.5 0 0 0 13 0C18.5 11 16 7.6 12 2.5z" fill="currentColor"/></svg><span>Our Building · بنايتنا</span></div></div>
-<nav id="tabs" style="display:none"><button id="tw"></button><button id="tbA"></button><button id="tbB"></button><button id="tbC"></button><button id="tbD"></button></nav>
+<nav id="tabs" style="display:none"><button id="tw"></button><button id="te" style="display:none"></button><button id="tbA"></button><button id="tbB"></button><button id="tbC"></button><button id="tbD"></button></nav>
 <div class="top" id="top" style="display:none">
 <div class="t1"><b id="ttl">Water bill</b><span><span id="per"></span><button class="lg" id="lg">العربية</button></span></div>
 <div class="big"><span id="got">0</span> <small id="lcol">LBP collected</small></div>
@@ -104,8 +104,8 @@ function render(){
 // The locked header: same look for the current invoice and the earlier ones.
 function fillTop(o){
  $('per').innerHTML='<bdi>'+esc(perT(o.period||''))+'</bdi>';
- $('ttl').innerHTML=esc(o.kind==='edl'?(LANG==='ar'?'فاتورة الكهرباء':'EDL bill'):(LANG==='ar'?'فاتورة المياه':'Water bill'))+(o.inv?'<small class="inv">'+esc(o.inv)+(o.old&&o.kind!=='edl'?' · '+(LANG==='ar'?'سابقة':'earlier'):'')+'</small>':'');
- $('lcol').textContent=o.kind==='edl'?(LANG==='ar'?'دولار تم تحصيله':'USD collected'):T('col');$('got').textContent=nf(o.got);var rmn=Math.round((o.sum-o.got)*100)/100;$('rem').textContent=nf(rmn);$('rem').style.color=(rmn>0?'':'#16a34a');$('cnt').textContent=T('paid',o.np,o.n);
+ $('ttl').innerHTML=esc(o.kind==='edl'?'\u26A1 '+(LANG==='ar'?'فاتورة الكهرباء':'EDL bill'):(LANG==='ar'?'فاتورة المياه':'Water bill'))+(o.inv?'<small class="inv">'+esc(o.inv)+(o.old&&o.kind!=='edl'?' · '+(LANG==='ar'?'سابقة':'earlier'):'')+'</small>':'');
+ $('lcol').textContent=o.kind==='edl'?(LANG==='ar'?'دولار تم تحصيله':'USD collected'):T('col');var cs=o.kind==='edl'?'$':'';$('got').textContent=cs+nf(o.got);var rmn=Math.round((o.sum-o.got)*100)/100;$('rem').textContent=cs+nf(rmn);$('rem').style.color=(rmn>0?'':'#16a34a');$('cnt').textContent=T('paid',o.np,o.n);
  $('pb').style.width=(o.sum?Math.min(100,o.got/o.sum*100):0)+'%';
 }
 function setP(i,v){
@@ -137,6 +137,8 @@ google.script.url.getLocation(function(loc){
 
 /* ---- Building tabs (A, B, C, D) ---- */
 var TAB='w',CURB='C';
+function ensureHv(){if(!D)return [];if(!D.hv){D.hv=[];(D.hist||[]).forEach(function(r,hi){var un=0;(r.rows||[]).forEach(function(x,i){if(x.k!=='block'&&x.k!=='total'&&x.k!=='grand'&&!(r.paid&&r.paid[i]))un++});if(un||Object.keys(r.diff||{}).length)D.hv.push(hi)})}return D.hv}
+function edlOpen(){return ensureHv().some(function(h){return D.hist[h].kind==='edl'})}
 function BL(){return CURB||'C'}
 function bldList(){var b=(D&&D.bld)||{};return ['A','B','C','D'].filter(function(L){return b[L]})}
 function pickB(){if(!D)return;if(!D.bld){D.bld={};if(D.blockc)D.bld.C=D.blockc}var ls=bldList();if(ls.indexOf(CURB)<0)CURB=ls[0]||'C';D.blockc=D.bld[CURB]||null}
@@ -144,7 +146,7 @@ var CI={en:{w:'Water',c:'Block C',month:'Monthly maintenance',col:'USD collected
 function CT(k){if(k==='c')return LANG==='ar'?'مبنى '+BL():'Block '+BL();return CI[LANG][k]}
  function arMon(s){var M={january:'كانون الثاني',february:'شباط',march:'آذار',april:'نيسان',may:'أيار',june:'حزيران',july:'تموز',august:'آب',september:'أيلول',october:'تشرين الأول',november:'تشرين الثاني',december:'كانون الأول'},x=/^\s*([A-Za-z]+)\s+(\d{4})/.exec(String(s||''));return x&&M[x[1].toLowerCase()]?M[x[1].toLowerCase()]+' '+x[2]:String(s||'')}
  function usd(n){var x=Math.round(n*100)/100;return '$'+x.toLocaleString('en-US',{minimumFractionDigits:0,maximumFractionDigits:2})}
-function showTab(){pickB();var ls=bldList(),hasC=ls.length>0;$('tabs').style.display=hasC?'flex':'none';var onC=hasC&&TAB==='c';$('tw').className=onC?'':'on';$('tw').textContent=CT('w');['A','B','C','D'].forEach(function(L){var b=$('tb'+L);b.style.display=ls.indexOf(L)>=0?'':'none';b.className=(onC&&CURB===L)?'on':'';b.textContent=LANG==='ar'?'مبنى '+L:'Block '+L});$('cmain').style.display=onC?'block':'none';$('list').parentNode.style.display=onC?'none':'';if(onC)$('top').style.display='none';else if(D)$('top').style.display=''}
+function showTab(){pickB();var ls=bldList(),hasC=ls.length>0,hasE=edlOpen();$('tabs').style.display=(hasC||hasE)?'flex':'none';if(TAB==='e'&&!hasE)TAB='w';var onC=hasC&&TAB==='c',onE=hasE&&TAB==='e';$('te').style.display=hasE?'':'none';$('te').className=onE?'on':'';$('te').textContent='\u26A1 '+(LANG==='ar'?'الكهرباء':'EDL');$('tw').className=(onC||onE)?'':'on';$('tw').textContent=CT('w');['A','B','C','D'].forEach(function(L){var b=$('tb'+L);b.style.display=ls.indexOf(L)>=0?'':'none';b.className=(onC&&CURB===L)?'on':'';b.textContent=LANG==='ar'?'مبنى '+L:'Block '+L});$('cmain').style.display=onC?'block':'none';$('list').parentNode.style.display=onC?'none':'';if(onC)$('top').style.display='none';else if(D)$('top').style.display=''}
 CI.en.dcov='Dues covered';CI.ar.dcov='الالتزامات المغطاة';CI.en.dsec='Dues to cover';CI.ar.dsec='الالتزامات المطلوب تغطيتها';CI.en.bpool='Building bills';CI.ar.bpool='فواتير المبنى';CI.en.stl='settled';CI.ar.stl='سدّدوا';CI.en.bych='By charge';CI.ar.bych='حسب البند';
 function cname(c){return esc(LANG==='ar'&&c.la?c.la:c.l)}
 function ca(c,nm){return (c.ov&&c.ov[nm]!=null)?c.ov[nm]:c.a}
@@ -185,7 +187,7 @@ function tickX(ci,ni){var bc=D.blockc,c=bc.cols[ci],nm=bc.names[ni],k='c'+ci+'_'
  function undo(){if(v)delete bc.paid[c.pk][nm];else bc.paid[c.pk][nm]=true;renderC()}
  google.script.run.withSuccessHandler(function(r){delete busy[k];if(!r||r.error){undo();toast(T('nosave'));return}D.blockc.paid[c.pk]=r;renderC()}).withFailureHandler(function(){delete busy[k];undo();toast(T('nosave'))}).setPaidX(TOK,c.pk,nm,v,BL())}
 var _render=render;render=function(){_render();if(D){showTab();renderC()}};
-$('tw').onclick=function(){TAB='w';showTab();window.scrollTo(0,0)};
+$('tw').onclick=function(){TAB='w';showTab();render();window.scrollTo(0,0)};$('te').onclick=function(){TAB='e';showTab();render();window.scrollTo(0,0)};
 ['A','B','C','D'].forEach(function(L){$('tb'+L).onclick=function(){TAB='c';CURB=L;showTab();renderC();window.scrollTo(0,0)}});
 
 // ---- invoices: tabs for the current round and earlier rounds still open; paid-amount differences ----
@@ -194,13 +196,12 @@ var css=document.createElement('style');css.textContent='body.uo .row.paid.df{di
 var _r2=render;
 render=function(){_r2.apply(this,arguments);try{renderHist()}catch(e){}};
 var SEL=null;
-function dfb(d,h,i){var ar=LANG==='ar',t=d>0?(ar?'مطلوب إضافي ':'To collect +')+nf(d):(ar?'للإرجاع ':'To return ')+nf(-d);return '<small class="dfb" data-dh="'+h+'" data-di="'+i+'" style="color:'+(d>0?'var(--bad)':'#b45309')+'">'+(d>0?'⬆ ':'⬇ ')+t+' · '+(ar?'اضغط عند التسوية':'tap when settled')+'</small>'}
+function dfb(d,h,i){var ar=LANG==='ar',cs=(h!=='c'&&D.hist[+h]&&D.hist[+h].kind==='edl')?'$':'',t=d>0?(ar?'مطلوب إضافي ':'To collect +')+cs+nf(d):(ar?'للإرجاع ':'To return ')+cs+nf(-d);return '<small class="dfb" data-dh="'+h+'" data-di="'+i+'" style="color:'+(d>0?'var(--bad)':'#b45309')+'">'+(d>0?'⬆ ':'⬇ ')+t+' · '+(ar?'اضغط عند التسوية':'tap when settled')+'</small>'}
 function curBadges(){Array.prototype.forEach.call($('list').querySelectorAll('.row[data-i]:not([data-h])'),function(el){var i=+el.getAttribute('data-i'),d=D.diff&&D.diff[i];if(d){el.classList.add('df');var nm=el.querySelector('.nm');if(nm)nm.insertAdjacentHTML('beforeend',dfb(d,'c',i))}})}
 function renderHist(){
  if(!D)return;
  var ar=LANG==='ar',sw=$('rsw');
- if(!D.hv){D.hv=[];(D.hist||[]).forEach(function(r,hi){var un=0;(r.rows||[]).forEach(function(x,i){if(x.k!=='block'&&x.k!=='total'&&x.k!=='grand'&&!(r.paid&&r.paid[i]))un++});if(un||Object.keys(r.diff||{}).length)D.hv.push(hi)})}
- var hv=D.hv,cur=!D.curHidden;
+ var onE=TAB==='e',hv=ensureHv().filter(function(h){return (D.hist[h].kind==='edl')===onE}),cur=!D.curHidden&&!onE;
  if(!sw){sw=document.createElement('div');sw.id='rsw';sw.onclick=function(e){var b=e.target.closest?e.target.closest('button'):null;if(!b)return;var s=+b.getAttribute('data-s');if(s===SEL)return;SEL=s;render();window.scrollTo(0,0)};var tp=$('top');tp.insertBefore(sw,tp.firstChild)}
  if(SEL!==null&&SEL!==-1&&hv.indexOf(SEL)<0)SEL=null;
  if(SEL===-1&&!cur)SEL=null;
@@ -213,17 +214,17 @@ function renderHist(){
  sw.innerHTML=ph;sw.style.display=((cur?1:0)+hv.length)>1?'flex':'none';
  if(SEL===-1&&cur){$('grand').style.display='';$('uoE').style.display='';curBadges();return}
  if(SEL===-1){$('list').innerHTML='<div class="msg">'+(ar?'لا توجد فواتير مياه مفتوحة حالياً':'No open water invoices right now')+'</div>';$('grand').style.display='none';$('uoE').style.display='none';$('top').style.display='none';return}
- var r=D.hist[SEL],df=r.diff||{},h='',open=false,z=0,sum=0,got=0,n=0,np=0,grand='',tt={},cb='';
+ var r=D.hist[SEL],df=r.diff||{},h='',open=false,ms=function(a){return r.kind==='edl'&&a?'$'+a:a},z=0,sum=0,got=0,n=0,np=0,grand='',tt={},cb='';
  (r.rows||[]).forEach(function(x){if(x.k==='block')cb=x.n;else if(x.k==='total')tt[cb]=x.a});
  (r.rows||[]).forEach(function(x,i){
-  if(x.k==='block'){if(open)h+='</section>';h+='<section><div class="band" style="'+bstyle(x.n)+'"><span>'+esc(bn(x.n))+'</span><span dir="ltr">'+esc(tt[x.n]||'')+'</span></div>';open=true;z=0;return}
+  if(x.k==='block'){if(open)h+='</section>';h+='<section><div class="band" style="'+bstyle(x.n)+'"><span>'+esc(bn(x.n))+'</span><span dir="ltr">'+esc(tt[x.n]?ms(tt[x.n]):'')+'</span></div>';open=true;z=0;return}
   if(x.k==='total')return;
   if(x.k==='grand'){grand=x.a;return}
   var p=r.paid&&r.paid[i]?1:0,d=p&&df[i],a=num(x.a);sum+=a;n++;if(p){got+=a;np++}
-  h+='<div class="row'+(z++%2?' z':'')+(p?' paid':'')+(d?' df':'')+'" data-h="'+SEL+'" data-i="'+i+'"><input type="checkbox"'+(p?' checked':'')+'><span class="nm">'+esc(x.n)+(d?dfb(d,SEL,i):'')+'</span><span class="am" dir="ltr">'+esc(x.a)+'</span></div>'});
+  h+='<div class="row'+(z++%2?' z':'')+(p?' paid':'')+(d?' df':'')+'" data-h="'+SEL+'" data-i="'+i+'"><input type="checkbox"'+(p?' checked':'')+'><span class="nm">'+esc(x.n)+(d?dfb(d,SEL,i):'')+'</span><span class="am" dir="ltr">'+esc(ms(x.a))+'</span></div>'});
  if(open)h+='</section>';
  $('list').innerHTML=h;
- $('grand').innerHTML=grand?'<div class="grand"><span>'+T('grand')+'</span><span dir="ltr">'+esc(grand)+'</span></div>':'';
+ $('grand').innerHTML=grand?'<div class="grand"><span>'+T('grand')+'</span><span dir="ltr">'+esc(ms(grand))+'</span></div>':'';
  $('grand').style.display='';$('uoE').style.display='';
  fillTop({inv:r.inv,period:r.period,kind:r.kind,got:got,sum:sum,np:np,n:n,old:1});$('top').style.display='block';
 }
