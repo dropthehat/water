@@ -21,7 +21,7 @@
 /* Anas's page now lives here on GitHub; Apps Script ("Water Collect") only sends and saves the data.
    This small adapter gives the page the same google.script.run / google.script.url calls it used inside Apps Script,
    so the page code below is unchanged. A building rep's link (Block A split, Block B/C/D pages) still opens the Apps Script page. */
-var APPV='2026-10-29b';
+var APPV='2026-10-29c';
 (function(){
  var EXEC='https://script.google.com/macros/s/AKfycbw0aOri7KloAq29a1Mksi3w-JlOoP4EgYUpoBJlwdqmgKVh72xGGPlxY0j9SGYUIqnJUw/exec';
  var P=new URLSearchParams(location.search),K=P.get('k')||'',V=P.get('v')||'';
@@ -79,8 +79,8 @@ main{max-width:560px;margin:0 auto;padding:6px 10px 40px}
 var TOK='',D=null,busy={};
 function $(i){return document.getElementById(i)}
 function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
-function num(s){return parseInt(String(s).replace(/[^0-9]/g,''),10)||0}
-function nf(n){return Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g,',')}
+function num(s){var v=parseFloat(String(s).replace(/[^0-9.]/g,''));return isFinite(v)?Math.round(v*100)/100:0}
+function nf(n){var v=Math.round(Number(n)*100)/100,p=(v%1===0?String(v):v.toFixed(2)).split('.');p[0]=p[0].replace(/\B(?=(\d{3})+(?!\d))/g,',');return p.join('.')}
 function toast(t){var e=$('toast');e.textContent=t;e.style.display='block';setTimeout(function(){e.style.display='none'},3500)}
 function err(t){$('list').innerHTML='<div class="msg err">'+esc(t)+'</div>'}
 function render(){
@@ -105,7 +105,7 @@ function render(){
 function fillTop(o){
  $('per').innerHTML='<bdi>'+esc(perT(o.period||''))+'</bdi>';
  $('ttl').innerHTML=esc(o.kind==='edl'?(LANG==='ar'?'فاتورة الكهرباء':'EDL bill'):(LANG==='ar'?'فاتورة المياه':'Water bill'))+(o.inv?'<small class="inv">'+esc(o.inv)+(o.old&&o.kind!=='edl'?' · '+(LANG==='ar'?'سابقة':'earlier'):'')+'</small>':'');
- $('lcol').textContent=o.kind==='edl'?(LANG==='ar'?'دولار تم تحصيله':'USD collected'):T('col');$('got').textContent=nf(o.got);$('rem').textContent=nf(o.sum-o.got);$('rem').style.color=(o.sum-o.got>0?'':'#16a34a');$('cnt').textContent=T('paid',o.np,o.n);
+ $('lcol').textContent=o.kind==='edl'?(LANG==='ar'?'دولار تم تحصيله':'USD collected'):T('col');$('got').textContent=nf(o.got);var rmn=Math.round((o.sum-o.got)*100)/100;$('rem').textContent=nf(rmn);$('rem').style.color=(rmn>0?'':'#16a34a');$('cnt').textContent=T('paid',o.np,o.n);
  $('pb').style.width=(o.sum?Math.min(100,o.got/o.sum*100):0)+'%';
 }
 function setP(i,v){
@@ -294,8 +294,8 @@ upd()})();
 
  var HI_W='💧 *فاتورة المياه · Water Invoice*', HI_B='🏢 *فاتورة البلوك C\u200F · Block C Invoice*', HR_W='🧾 *إيصال المياه · Water Receipt*', HR_B='🧾 *إيصال البلوك C\u200F · Block C Receipt*';
  var NOTE='────────────────\n_ملاحظة: هذه رسالة تلقائية. لأي استفسار أو تعديل، يُرجى الرد مباشرة عبر هذه المحادثة._\n_Note: This is an automated message. For any questions or corrections, please reply directly to this chat._\n\n💧 *بنايتنا · Our Building*';
- function num(s){return parseInt(String(s).replace(/[^0-9]/g,''),10)||0}
- function nf(n){return Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g,',')}
+ function num(s){var v=parseFloat(String(s).replace(/[^0-9.]/g,''));return isFinite(v)?Math.round(v*100)/100:0}
+ function nf(n){var v=Math.round(Number(n)*100)/100,p=(v%1===0?String(v):v.toFixed(2)).split('.');p[0]=p[0].replace(/\B(?=(\d{3})+(?!\d))/g,',');return p.join('.')}
  function arMon(s){var M={january:'كانون الثاني',february:'شباط',march:'آذار',april:'نيسان',may:'أيار',june:'حزيران',july:'تموز',august:'آب',september:'أيلول',october:'تشرين الأول',november:'تشرين الثاني',december:'كانون الأول'},x=/^\s*([A-Za-z]+)\s+(\d{4})/.exec(String(s||''));return x&&M[x[1].toLowerCase()]?M[x[1].toLowerCase()]+' '+x[2]:String(s||'')}
  function usd(x){return '$'+(Math.round(x*100)/100)}
  function link(ph,msg){return 'https://wa.me/'+ph+'?text='+encodeURIComponent(msg)}
