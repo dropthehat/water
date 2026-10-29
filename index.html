@@ -21,7 +21,7 @@
 /* Anas's page now lives here on GitHub; Apps Script ("Water Collect") only sends and saves the data.
    This small adapter gives the page the same google.script.run / google.script.url calls it used inside Apps Script,
    so the page code below is unchanged. A building rep's link (Block A split, Block B/C/D pages) still opens the Apps Script page. */
-var APPV='2026-10-29a';
+var APPV='2026-10-29b';
 (function(){
  var EXEC='https://script.google.com/macros/s/AKfycbw0aOri7KloAq29a1Mksi3w-JlOoP4EgYUpoBJlwdqmgKVh72xGGPlxY0j9SGYUIqnJUw/exec';
  var P=new URLSearchParams(location.search),K=P.get('k')||'',V=P.get('v')||'';
@@ -105,7 +105,7 @@ function render(){
 function fillTop(o){
  $('per').innerHTML='<bdi>'+esc(perT(o.period||''))+'</bdi>';
  $('ttl').innerHTML=esc(o.kind==='edl'?(LANG==='ar'?'فاتورة الكهرباء':'EDL bill'):(LANG==='ar'?'فاتورة المياه':'Water bill'))+(o.inv?'<small class="inv">'+esc(o.inv)+(o.old&&o.kind!=='edl'?' · '+(LANG==='ar'?'سابقة':'earlier'):'')+'</small>':'');
- $('got').textContent=nf(o.got);$('rem').textContent=nf(o.sum-o.got);$('rem').style.color=(o.sum-o.got>0?'':'#16a34a');$('cnt').textContent=T('paid',o.np,o.n);
+ $('lcol').textContent=o.kind==='edl'?(LANG==='ar'?'دولار تم تحصيله':'USD collected'):T('col');$('got').textContent=nf(o.got);$('rem').textContent=nf(o.sum-o.got);$('rem').style.color=(o.sum-o.got>0?'':'#16a34a');$('cnt').textContent=T('paid',o.np,o.n);
  $('pb').style.width=(o.sum?Math.min(100,o.got/o.sum*100):0)+'%';
 }
 function setP(i,v){
@@ -253,9 +253,9 @@ $('list').onclick=function(e){var db=e.target.closest?e.target.closest('.dfb'):n
  function usd(x){return '$'+(Math.round(x*100)/100)}
  function edlMsg(r,per){var p=per||'';
   return '⚡ *فاتورة الكهرباء · EDL Invoice*\n\n'
-   +'تحية طيبة *'+r.n+'*، 👋\n\nبلغت حصتكم من فاتورة الكهرباء (EDL) — *'+p+'* — ما مجموعه *'+r.a+' ل.ل.* 📊⚡.\n\n👉 *يُرجى تسديد هذا المبلغ وتسليمه إلى أنس.*\n\nنشكر لكم حسن تعاونكم معنا! 🙏✨'
+   +'تحية طيبة *'+r.n+'*، 👋\n\nبلغت حصتكم من فاتورة الكهرباء (EDL) — *'+p+'* — ما مجموعه *'+r.a+' دولار* 📊⚡.\n\n👉 *يُرجى تسديد هذا المبلغ وتسليمه إلى أنس.*\n\nنشكر لكم حسن تعاونكم معنا! 🙏✨'
    +'\n\n'
-   +'Hello *'+r.n+'*, 👋\n\nYour share of the EDL (electricity) bill — *'+p+'* — comes out to a total of *'+r.a+' LBP* 📊⚡.\n\n👉 *Please settle this amount by passing it to Anas.*\n\nThank you for your valued cooperation! 🙏✨'
+   +'Hello *'+r.n+'*, 👋\n\nYour share of the EDL (electricity) bill — *'+p+'* — comes out to a total of *'+r.a+' USD* 📊⚡.\n\n👉 *Please settle this amount by passing it to Anas.*\n\nThank you for your valued cooperation! 🙏✨'
    +'\n\n'+NOTE}
  function bcMsg(bc,nm){var cols=bc.cols||[],pd=bc.paid||{},en='',ar='',due=0,an=(bc.nameAr&&bc.nameAr[nm])||nm;
   cols.forEach(function(c){var a=(c.ov&&c.ov[nm]!=null)?c.ov[nm]:c.a;if(!(a>0))return;var p=pd[c.pk]&&pd[c.pk][nm];en+='• '+c.l+': '+usd(a)+(p?' ✅':'')+'\n';ar+='• '+(c.la||c.l)+': '+usd(a)+(p?' ✅':'')+'\n';if(!p)due+=a});
@@ -323,12 +323,12 @@ upd()})();
  }
  function edlRc(r,ro,idx){
   var p=ro.period||'', a=num(r.a), left=leftWater(r,ro,idx), sum=0, lar='', len='';
-  left.forEach(function(x){sum+=x.a;lar+='• '+x.p+': '+nf(x.a)+' ل.ل.\n';len+='• '+x.p+': '+nf(x.a)+' LBP\n'});
-  var ar='تحية طيبة *'+r.n+'*، 👋\n\n✅ *إيصال استلام* — وصلنا منكم *'+nf(a)+' ل.ل.* عن فاتورة الكهرباء (EDL) — *'+p+'*. ⚡\n\n'
-   +(sum?'⚠️ *المتبقي عليكم:*\n'+lar+'*المجموع: '+nf(sum)+' ل.ل.*\n\nيُرجى تسديده عند الإمكان.':'🎉 لا يوجد أي مبلغ متبقٍّ عليكم — كل شيء مسدَّد.')
+  left.forEach(function(x){sum+=x.a;lar+='• '+x.p+': '+nf(x.a)+' دولار\n';len+='• '+x.p+': '+nf(x.a)+' USD\n'});
+  var ar='تحية طيبة *'+r.n+'*، 👋\n\n✅ *إيصال استلام* — وصلنا منكم *'+nf(a)+' دولار* عن فاتورة الكهرباء (EDL) — *'+p+'*. ⚡\n\n'
+   +(sum?'⚠️ *المتبقي عليكم:*\n'+lar+'*المجموع: '+nf(sum)+' دولار*\n\nيُرجى تسديده عند الإمكان.':'🎉 لا يوجد أي مبلغ متبقٍّ عليكم — كل شيء مسدَّد.')
    +'\n\nنشكر لكم حسن تعاونكم معنا! 🙏✨';
-  var en='Hello *'+r.n+'*, 👋\n\n✅ *Payment receipt* — we received *'+nf(a)+' LBP* for the EDL (electricity) bill — *'+p+'*. ⚡\n\n'
-   +(sum?'⚠️ *Still remaining:*\n'+len+'*Total: '+nf(sum)+' LBP*\n\nPlease settle it when you can.':'🎉 Nothing is left to pay — you are all settled.')
+  var en='Hello *'+r.n+'*, 👋\n\n✅ *Payment receipt* — we received *'+nf(a)+' USD* for the EDL (electricity) bill — *'+p+'*. ⚡\n\n'
+   +(sum?'⚠️ *Still remaining:*\n'+len+'*Total: '+nf(sum)+' USD*\n\nPlease settle it when you can.':'🎉 Nothing is left to pay — you are all settled.')
    +'\n\nThank you for your valued cooperation! 🙏✨';
   return '🧾 *إيصال الكهرباء · EDL Receipt*\n\n'+ar+'\n\n'+en+'\n\n'+NOTE;
  }
