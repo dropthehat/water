@@ -21,7 +21,7 @@
 /* Anas's page now lives here on GitHub; Apps Script ("Water Collect") only sends and saves the data.
    This small adapter gives the page the same google.script.run / google.script.url calls it used inside Apps Script,
    so the page code below is unchanged. A building rep's link (Block A split, Block B/C/D pages) still opens the Apps Script page. */
-var APPV='2026-10-26b';
+var APPV='2026-10-29a';
 (function(){
  var EXEC='https://script.google.com/macros/s/AKfycbw0aOri7KloAq29a1Mksi3w-JlOoP4EgYUpoBJlwdqmgKVh72xGGPlxY0j9SGYUIqnJUw/exec';
  var P=new URLSearchParams(location.search),K=P.get('k')||'',V=P.get('v')||'';
@@ -104,7 +104,7 @@ function render(){
 // The locked header: same look for the current invoice and the earlier ones.
 function fillTop(o){
  $('per').innerHTML='<bdi>'+esc(perT(o.period||''))+'</bdi>';
- $('ttl').innerHTML=esc(LANG==='ar'?'فاتورة المياه':'Water bill')+(o.inv?'<small class="inv">'+esc(o.inv)+(o.old?' · '+(LANG==='ar'?'سابقة':'earlier'):'')+'</small>':'');
+ $('ttl').innerHTML=esc(o.kind==='edl'?(LANG==='ar'?'فاتورة الكهرباء':'EDL bill'):(LANG==='ar'?'فاتورة المياه':'Water bill'))+(o.inv?'<small class="inv">'+esc(o.inv)+(o.old&&o.kind!=='edl'?' · '+(LANG==='ar'?'سابقة':'earlier'):'')+'</small>':'');
  $('got').textContent=nf(o.got);$('rem').textContent=nf(o.sum-o.got);$('rem').style.color=(o.sum-o.got>0?'':'#16a34a');$('cnt').textContent=T('paid',o.np,o.n);
  $('pb').style.width=(o.sum?Math.min(100,o.got/o.sum*100):0)+'%';
 }
@@ -209,7 +209,7 @@ function renderHist(){
  function pill(s,t){var on=SEL===s;return '<button data-s="'+s+'" style="border:1px solid '+(on?'var(--band)':'var(--line)')+';background:'+(on?'var(--band)':'var(--card)')+';color:'+(on?'#fff':'var(--ink)')+'">'+t+'</button>'}
  function lab(no,n,c){var k=n?(ar?n+' متبقٍ':n+' left'):'✓';return '<span dir="ltr">'+esc(no)+'</span><small>'+(c?(ar?'الحالية · ':'Current · '):'')+k+'</small>'}
  var ph=cur?pill(-1,lab(D.inv||(ar?'الحالية':'Current'),left(D).n,1)):'';
- hv.forEach(function(hi){var r=D.hist[hi];ph+=pill(hi,lab(r.inv||r.period||'',left(r).n,0))});
+ hv.forEach(function(hi){var r=D.hist[hi];ph+=pill(hi,lab((r.kind==='edl'?'\u26A1 ':'')+(r.inv||r.period||''),left(r).n,0))});
  sw.innerHTML=ph;sw.style.display=((cur?1:0)+hv.length)>1?'flex':'none';
  if(SEL===-1&&cur){$('grand').style.display='';$('uoE').style.display='';curBadges();return}
  if(SEL===-1){$('list').innerHTML='<div class="msg">'+(ar?'لا توجد فواتير مياه مفتوحة حالياً':'No open water invoices right now')+'</div>';$('grand').style.display='none';$('uoE').style.display='none';$('top').style.display='none';return}
@@ -225,7 +225,7 @@ function renderHist(){
  $('list').innerHTML=h;
  $('grand').innerHTML=grand?'<div class="grand"><span>'+T('grand')+'</span><span dir="ltr">'+esc(grand)+'</span></div>':'';
  $('grand').style.display='';$('uoE').style.display='';
- fillTop({inv:r.inv,period:r.period,got:got,sum:sum,np:np,n:n,old:1});$('top').style.display='block';
+ fillTop({inv:r.inv,period:r.period,kind:r.kind,got:got,sum:sum,np:np,n:n,old:1});$('top').style.display='block';
 }
 function setH(hi,i){var r=D.hist[hi];r.paid=r.paid||{};var v=!r.paid[i];if(v)r.paid[i]=1;else delete r.paid[i];if(r.diff)delete r.diff[i];render();
  google.script.run.withSuccessHandler(function(p){r.paid=p||{};render()}).withFailureHandler(function(){if(v)delete r.paid[i];else r.paid[i]=1;render();toast(T('nosave'))}).setPaidH(TOK,r.inv,i,v?1:0)}
@@ -251,6 +251,12 @@ $('list').onclick=function(e){var db=e.target.closest?e.target.closest('.dfb'):n
   return wrap('تحية طيبة *'+r.n+'*، 👋\n\nبلغت قيمة فاتورة المياه الخاصة بكم للفترة *'+p.replace(' to ',' إلى ')+'* ما مجموعه *'+r.a+' ل.ل.* 📊💧.\n\n👉 *يُرجى تسديد هذا المبلغ وتسليمه إلى أنس.*\n\nنشكر لكم حسن تعاونكم معنا! 🙏✨','Hello *'+r.n+'*, 👋\n\nYour water bill for the period *'+p+'* comes out to a total of *'+r.a+' LBP* 📊💧.\n\n👉 *Please settle this amount by passing it to Anas.*\n\nThank you for your valued cooperation! 🙏✨')}
  function arMon(s){var M={january:'كانون الثاني',february:'شباط',march:'آذار',april:'نيسان',may:'أيار',june:'حزيران',july:'تموز',august:'آب',september:'أيلول',october:'تشرين الأول',november:'تشرين الثاني',december:'كانون الأول'},x=/^\s*([A-Za-z]+)\s+(\d{4})/.exec(String(s||''));return x&&M[x[1].toLowerCase()]?M[x[1].toLowerCase()]+' '+x[2]:String(s||'')}
  function usd(x){return '$'+(Math.round(x*100)/100)}
+ function edlMsg(r,per){var p=per||'';
+  return '⚡ *فاتورة الكهرباء · EDL Invoice*\n\n'
+   +'تحية طيبة *'+r.n+'*، 👋\n\nبلغت حصتكم من فاتورة الكهرباء (EDL) — *'+p+'* — ما مجموعه *'+r.a+' ل.ل.* 📊⚡.\n\n👉 *يُرجى تسديد هذا المبلغ وتسليمه إلى أنس.*\n\nنشكر لكم حسن تعاونكم معنا! 🙏✨'
+   +'\n\n'
+   +'Hello *'+r.n+'*, 👋\n\nYour share of the EDL (electricity) bill — *'+p+'* — comes out to a total of *'+r.a+' LBP* 📊⚡.\n\n👉 *Please settle this amount by passing it to Anas.*\n\nThank you for your valued cooperation! 🙏✨'
+   +'\n\n'+NOTE}
  function bcMsg(bc,nm){var cols=bc.cols||[],pd=bc.paid||{},en='',ar='',due=0,an=(bc.nameAr&&bc.nameAr[nm])||nm;
   cols.forEach(function(c){var a=(c.ov&&c.ov[nm]!=null)?c.ov[nm]:c.a;if(!(a>0))return;var p=pd[c.pk]&&pd[c.pk][nm];en+='• '+c.l+': '+usd(a)+(p?' ✅':'')+'\n';ar+='• '+(c.la||c.l)+': '+usd(a)+(p?' ✅':'')+'\n';if(!p)due+=a});
   if(!(due>0))return wrap('تحية طيبة *'+an+'*، 👋\n\nالبلوك C\u200F · *'+arMon(bc.month)+'*\n\nلا يترتب عليكم أي مبلغ هذا الشهر — كل شيء مسدّد. ✅\n\nنشكر لكم حسن تعاونكم معنا! 🙏✨','Hello *'+nm+'*, 👋\n\nBlock C · *'+bc.month+'*\n\nYou have nothing to pay this month — all settled. ✅\n\nThank you for your valued cooperation! 🙏✨');
@@ -259,7 +265,7 @@ $('list').onclick=function(e){var db=e.target.closest?e.target.closest('.dfb'):n
   if(!window.D)return;
   document.querySelectorAll('#list .row[data-i]').forEach(function(el){if(el.querySelector('.wa'))return;var hh=el.getAttribute('data-h'),ro=hh!=null?(D.hist||[])[+hh]:D,r=ro&&ro.rows&&ro.rows[+el.getAttribute('data-i')];if(!r||String(r.a).trim()==='')return;
    var ph=r.ph;if(!ph)(D.rows||[]).forEach(function(x){if(!ph&&x.k==='apt'&&x.ph&&((r.id&&x.id===r.id)||x.n===r.n))ph=x.ph});
-   if(ph)el.appendChild(mk(link(ph,waterMsg(r,ro.period))))});
+   if(ph)el.appendChild(mk(link(ph,ro.kind==='edl'?edlMsg(r,ro.period):waterMsg(r,ro.period))))});
   var bc=D.blockc;if(bc&&bc.phones){var cards=document.querySelectorAll('#cpanel .apt');(bc.names||[]).forEach(function(nm,i){var el=cards[i];if(!el||el.querySelector('.wa'))return;var ph=bc.phones[nm];if(!ph)return;var h=el.querySelector('.ah');(h||el).appendChild(mk(link(ph,bcMsg(bc,nm))))})}
  }catch(e){}};
  document.addEventListener('click',function(e){if(e.target.closest&&e.target.closest('.wa'))e.stopPropagation()},true);
@@ -306,6 +312,7 @@ upd()})();
  function leftWater(r,ro,idx){
   var out=[], rounds=[D].concat(D.hist||[]);
   rounds.forEach(function(rd){
+   if((rd.kind==='edl')!==(ro.kind==='edl'))return;
    (rd.rows||[]).forEach(function(x,i){
     if(x.k!=='apt'||!same(x,r)||(rd===ro&&i===idx))return;
     var a=num(x.a);
@@ -313,6 +320,17 @@ upd()})();
    });
   });
   return out;
+ }
+ function edlRc(r,ro,idx){
+  var p=ro.period||'', a=num(r.a), left=leftWater(r,ro,idx), sum=0, lar='', len='';
+  left.forEach(function(x){sum+=x.a;lar+='• '+x.p+': '+nf(x.a)+' ل.ل.\n';len+='• '+x.p+': '+nf(x.a)+' LBP\n'});
+  var ar='تحية طيبة *'+r.n+'*، 👋\n\n✅ *إيصال استلام* — وصلنا منكم *'+nf(a)+' ل.ل.* عن فاتورة الكهرباء (EDL) — *'+p+'*. ⚡\n\n'
+   +(sum?'⚠️ *المتبقي عليكم:*\n'+lar+'*المجموع: '+nf(sum)+' ل.ل.*\n\nيُرجى تسديده عند الإمكان.':'🎉 لا يوجد أي مبلغ متبقٍّ عليكم — كل شيء مسدَّد.')
+   +'\n\nنشكر لكم حسن تعاونكم معنا! 🙏✨';
+  var en='Hello *'+r.n+'*, 👋\n\n✅ *Payment receipt* — we received *'+nf(a)+' LBP* for the EDL (electricity) bill — *'+p+'*. ⚡\n\n'
+   +(sum?'⚠️ *Still remaining:*\n'+len+'*Total: '+nf(sum)+' LBP*\n\nPlease settle it when you can.':'🎉 Nothing is left to pay — you are all settled.')
+   +'\n\nThank you for your valued cooperation! 🙏✨';
+  return '🧾 *إيصال الكهرباء · EDL Receipt*\n\n'+ar+'\n\n'+en+'\n\n'+NOTE;
  }
  function waterRc(r,ro,idx){
   var p=ro.period||'', a=num(r.a), left=leftWater(r,ro,idx), sum=0, lar='', len='';
@@ -356,7 +374,7 @@ upd()})();
    var ro=(h!=null)?(D.hist||[])[+h]:D, r=ro&&ro.rows&&ro.rows[i];
    if(!r||r.k!=='apt'||!(num(r.a)>0))return;
    var ph=phoneOf(r); if(!ph)return;
-   el.appendChild(mk(link(ph,waterRc(r,ro,i))));
+   el.appendChild(mk(link(ph,(ro.kind==='edl'?edlRc:waterRc)(r,ro,i))));
   });
   var bc=D.blockc;
   if(bc&&bc.phones){
