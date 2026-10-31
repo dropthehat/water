@@ -21,7 +21,7 @@
 /* Anas's page now lives here on GitHub; Apps Script ("Water Collect") only sends and saves the data.
    This small adapter gives the page the same google.script.run / google.script.url calls it used inside Apps Script,
    so the page code below is unchanged. A building rep's link (Block A split, Block B/C/D pages) still opens the Apps Script page. */
-var APPV='2026-10-29d';
+var APPV='2026-10-31a';
 (function(){
  var EXEC='https://script.google.com/macros/s/AKfycbw0aOri7KloAq29a1Mksi3w-JlOoP4EgYUpoBJlwdqmgKVh72xGGPlxY0j9SGYUIqnJUw/exec';
  var P=new URLSearchParams(location.search),K=P.get('k')||'',V=P.get('v')||'';
@@ -245,7 +245,7 @@ $('list').onclick=function(e){var db=e.target.closest?e.target.closest('.dfb'):n
  function link(ph,msg){return 'https://wa.me/'+ph+'?text='+encodeURIComponent(msg)}
  function mk(href){var a=document.createElement('a');a.className='wa';a.href=href;a.target='_blank';a.rel='noopener';a.title='WhatsApp';a.textContent='📣';return a}
  var HI_W='💧 *فاتورة المياه · Water Invoice*', HI_B='🏢 *فاتورة البلوك C\u200F · Block C Invoice*', HR_W='🧾 *إيصال المياه · Water Receipt*', HR_B='🧾 *إيصال البلوك C\u200F · Block C Receipt*';
- var NOTE='────────────────────\n_ملاحظة: هذه رسالة تلقائية. لأي استفسار أو تعديل، يُرجى الرد مباشرة عبر هذه المحادثة._\n_Note: This is an automated message. For any questions or corrections, please reply directly to this chat._\n\n💧 *بنايتنا · Our Building*';
+ var NOTE='────────────────────\n💧 *بنايتنا · Our Building*';
  function wrap(ar,en){var rc=ar.indexOf('إيصال استلام')>-1,bk=ar.indexOf('البلوك C')>-1,HDR=rc?(bk?HR_B:HR_W):(bk?HI_B:HI_W);var t=HDR+'\n\n'+ar+'\n\n'+en+'\n\n'+NOTE;return (bk&&BL()!=='C')?t.replace(/البلوك C/g,'البلوك '+BL()).replace(/Block C/g,'Block '+BL()):t}
  function waterMsg(r,per){var p=per||D.period||'';
   if(!(num(r.a)>0))return wrap('تحية طيبة *'+r.n+'*، 👋\n\nبلغت قيمة فاتورة المياه الخاصة بكم للفترة *'+p.replace(' to ',' إلى ')+'* ما مجموعه *0 ل.ل.* 💧 — لا يترتب عليكم أي مبلغ في هذه الدورة. 🎉\n\nنشكر لكم حسن تعاونكم معنا! 🙏✨','Hello *'+r.n+'*, 👋\n\nYour water bill for the period *'+p+'* comes out to *0 LBP* 💧 — you have nothing to pay this round. 🎉\n\nThank you for your valued cooperation! 🙏✨');
@@ -294,7 +294,7 @@ upd()})();
  document.head.appendChild(css);
 
  var HI_W='💧 *فاتورة المياه · Water Invoice*', HI_B='🏢 *فاتورة البلوك C\u200F · Block C Invoice*', HR_W='🧾 *إيصال المياه · Water Receipt*', HR_B='🧾 *إيصال البلوك C\u200F · Block C Receipt*';
- var NOTE='────────────────\n_ملاحظة: هذه رسالة تلقائية. لأي استفسار أو تعديل، يُرجى الرد مباشرة عبر هذه المحادثة._\n_Note: This is an automated message. For any questions or corrections, please reply directly to this chat._\n\n💧 *بنايتنا · Our Building*';
+ var NOTE='────────────────\n💧 *بنايتنا · Our Building*';
  function num(s){var v=parseFloat(String(s).replace(/[^0-9.]/g,''));return isFinite(v)?Math.round(v*100)/100:0}
  function nf(n){var v=Math.round(Number(n)*100)/100,p=(v%1===0?String(v):v.toFixed(2)).split('.');p[0]=p[0].replace(/\B(?=(\d{3})+(?!\d))/g,',');return p.join('.')}
  function arMon(s){var M={january:'كانون الثاني',february:'شباط',march:'آذار',april:'نيسان',may:'أيار',june:'حزيران',july:'تموز',august:'آب',september:'أيلول',october:'تشرين الأول',november:'تشرين الثاني',december:'كانون الأول'},x=/^\s*([A-Za-z]+)\s+(\d{4})/.exec(String(s||''));return x&&M[x[1].toLowerCase()]?M[x[1].toLowerCase()]+' '+x[2]:String(s||'')}
