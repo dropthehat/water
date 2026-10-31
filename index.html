@@ -21,7 +21,7 @@
 /* Anas's page now lives here on GitHub; Apps Script ("Water Collect") only sends and saves the data.
    This small adapter gives the page the same google.script.run / google.script.url calls it used inside Apps Script,
    so the page code below is unchanged. A building rep's link (Block A split, Block B/C/D pages) still opens the Apps Script page. */
-var APPV='2026-10-31a';
+var APPV='2026-10-31b';
 (function(){
  var EXEC='https://script.google.com/macros/s/AKfycbw0aOri7KloAq29a1Mksi3w-JlOoP4EgYUpoBJlwdqmgKVh72xGGPlxY0j9SGYUIqnJUw/exec';
  var P=new URLSearchParams(location.search),K=P.get('k')||'',V=P.get('v')||'';
@@ -147,26 +147,33 @@ function CT(k){if(k==='c')return LANG==='ar'?'مبنى '+BL():'Block '+BL();retu
  function arMon(s){var M={january:'كانون الثاني',february:'شباط',march:'آذار',april:'نيسان',may:'أيار',june:'حزيران',july:'تموز',august:'آب',september:'أيلول',october:'تشرين الأول',november:'تشرين الثاني',december:'كانون الأول'},x=/^\s*([A-Za-z]+)\s+(\d{4})/.exec(String(s||''));return x&&M[x[1].toLowerCase()]?M[x[1].toLowerCase()]+' '+x[2]:String(s||'')}
  function usd(n){var x=Math.round(n*100)/100;return '$'+x.toLocaleString('en-US',{minimumFractionDigits:0,maximumFractionDigits:2})}
 function showTab(){pickB();var ls=bldList(),hasC=ls.length>0,hasE=edlOpen();$('tabs').style.display=(hasC||hasE)?'flex':'none';if(TAB==='e'&&!hasE)TAB='w';var onC=hasC&&TAB==='c',onE=hasE&&TAB==='e';$('te').style.display=hasE?'':'none';$('te').className=onE?'on':'';$('te').textContent='\u26A1 '+(LANG==='ar'?'الكهرباء':'EDL');$('tw').className=(onC||onE)?'':'on';$('tw').textContent=CT('w');['A','B','C','D'].forEach(function(L){var b=$('tb'+L);b.style.display=ls.indexOf(L)>=0?'':'none';b.className=(onC&&CURB===L)?'on':'';b.textContent=LANG==='ar'?'مبنى '+L:'Block '+L});$('cmain').style.display=onC?'block':'none';$('list').parentNode.style.display=onC?'none':'';if(onC)$('top').style.display='none';else if(D)$('top').style.display=''}
-CI.en.dcov='Dues covered';CI.ar.dcov='الالتزامات المغطاة';CI.en.dsec='Dues to cover';CI.ar.dsec='الالتزامات المطلوب تغطيتها';CI.en.bpool='Building bills';CI.ar.bpool='فواتير المبنى';CI.en.stl='settled';CI.ar.stl='سدّدوا';CI.en.bych='By charge';CI.ar.bych='حسب البند';
+CI.en.dcov='Dues covered';CI.ar.dcov='الالتزامات المغطاة';CI.en.dsec='Dues to cover';CI.ar.dsec='الالتزامات المطلوب تغطيتها';CI.en.bpool='Building bills';CI.ar.bpool='فواتير المبنى';CI.en.stl='settled';CI.ar.stl='سدّدوا';CI.en.edlc='EDL collected';CI.ar.edlc='الكهرباء المحصّلة';CI.en.bych='By charge';CI.ar.bych='حسب البند';
 function cname(c){return esc(LANG==='ar'&&c.la?c.la:c.l)}
 function ca(c,nm){return (c.ov&&c.ov[nm]!=null)?c.ov[nm]:c.a}
 function colSum(c){var t=0;((D&&D.blockc&&D.blockc.names)||[]).forEach(function(nm){t+=ca(c,nm)});return t}
+function allCols(bc){var cs=(bc&&bc.cols)||[];if(!bc||BL()!=='C'||!bc.codes||!D.hist)return cs;
+ var hv=ensureHv(),hi=-1;for(var q=0;q<hv.length;q++){var r0=D.hist[hv[q]];if(r0&&r0.kind==='edl'){hi=hv[q];break}}
+ if(hi<0)return cs;var r=D.hist[hi],ov={},idx={},any=false;
+ (bc.names||[]).forEach(function(nm){var id=bc.codes[nm];if(!id)return;(r.rows||[]).forEach(function(x,i){if(x.k==='apt'&&x.id===id&&idx[nm]==null){idx[nm]=i;ov[nm]=num(x.a);any=true}})});
+ if(!any)return cs;return cs.concat([{pk:'e:'+r.inv,l:'\u26A1 EDL',la:'\u26A1 \u0627\u0644\u0643\u0647\u0631\u0628\u0627\u0621',a:0,ov:ov,_e:{h:hi,idx:idx}}])}
 function renderC(){var bc=D&&D.blockc;if(!bc){$('cpanel').innerHTML='';return}
- var cols=bc.cols||[],names=bc.names||[],pd=bc.paid||{},n=names.length;
- function isP(c,nm){return !!(pd[c.pk]&&pd[c.pk][nm])}
+ var cols=allCols(bc),names=bc.names||[],pd=bc.paid||{},n=names.length;
+ function isP(c,nm){if(c._e){var er=D.hist[c._e.h];return !!(er&&er.paid&&er.paid[c._e.idx[nm]])}return !!(pd[c.pk]&&pd[c.pk][nm])}
  var sum=0,got=0,settled=0;
  cols.forEach(function(c){sum+=colSum(c);names.forEach(function(nm){if(isP(c,nm))got+=ca(c,nm)})});
  names.forEach(function(nm){if(cols.length&&cols.every(function(c){return ca(c,nm)<=0||isP(c,nm)}))settled++});
  var pct=sum?Math.round(got*100/sum):0;
  var maintCol=cols.filter(function(c){return c.pk.indexOf('m:maint:')===0})[0];
  function colGot(c){var k=0;names.forEach(function(nm){if(isP(c,nm))k+=ca(c,nm)});return k}
+ var ec=cols.filter(function(c){return c._e})[0],edlh='';
+ if(ec){var eg=colGot(ec),es=colSum(ec),ep=es?Math.round(eg*100/es):0;edlh='<div class="sub" style="margin-top:8px"><span>\u26A1 '+CT('edlc')+'</span><span dir="ltr"><b>'+usd(eg)+'</b> / '+usd(es)+'</span></div><div class="bar"><i style="width:'+ep+'%"></i></div>'}
  var B=0;(bc.bills||[]).forEach(function(b){B+=b.a});
  var dr=[];
  if(B>0)dr.push({l:CT('bpool'),req:B,got:maintCol?Math.min(colGot(maintCol),B):0});
- cols.forEach(function(c){if(c===maintCol)return;dr.push({l:cname(c),req:colSum(c),got:colGot(c),math:(c.ov&&Object.keys(c.ov).length)?'':usd(c.a)+' \u00d7 '+n})});
+ cols.forEach(function(c){if(c===maintCol||c._e)return;dr.push({l:cname(c),req:colSum(c),got:colGot(c),math:(c.ov&&Object.keys(c.ov).length)?'':usd(c.a)+' \u00d7 '+n})});
  var dreq=0,dgot=0;dr.forEach(function(r){dreq+=r.req;dgot+=r.got});var dp=dreq?Math.round(dgot*100/dreq):0;
  var cnt=LANG==='ar'?('سدّد '+settled+' من '+n):(settled+' of '+n+' '+CT('stl'));
- var h='<div class="top"><div class="t1"><b>'+esc(CT('c'))+'</b><span><bdi>'+esc(bc.month)+'</bdi></span></div><div class="big"><span dir="ltr">'+usd(got)+'</span> <small>'+CT('col')+'</small></div><div class="bar"><i style="width:'+pct+'%"></i></div><div class="sub"><span>'+cnt+'</span><span>'+CT('rem')+' <b dir="ltr" class="'+(sum-got>0?'rd':'rz')+'">'+usd(sum-got)+'</b></span></div>'+(dr.length?'<div class="sub" style="margin-top:8px"><span>'+CT('dcov')+'</span><span dir="ltr"><b>'+usd(dgot)+'</b> / '+usd(dreq)+'</span></div><div class="bar"><i style="width:'+dp+'%"></i></div>':'')+'<div class="cflt"><button id="cuo">'+esc(($('uo')&&$('uo').textContent)||'')+'</button></div></div>';
+ var h='<div class="top"><div class="t1"><b>'+esc(CT('c'))+'</b><span><bdi>'+esc(bc.month)+'</bdi></span></div><div class="big"><span dir="ltr">'+usd(got)+'</span> <small>'+CT('col')+'</small></div><div class="bar"><i style="width:'+pct+'%"></i></div><div class="sub"><span>'+cnt+'</span><span>'+CT('rem')+' <b dir="ltr" class="'+(sum-got>0?'rd':'rz')+'">'+usd(sum-got)+'</b></span></div>'+(dr.length?'<div class="sub" style="margin-top:8px"><span>'+CT('dcov')+'</span><span dir="ltr"><b>'+usd(dgot)+'</b> / '+usd(dreq)+'</span></div><div class="bar"><i style="width:'+dp+'%"></i></div>':'')+edlh+'<div class="cflt"><button id="cuo">'+esc(($('uo')&&$('uo').textContent)||'')+'</button></div></div>';
  if(false){h+='<section style="margin-bottom:14px"><div class="band"><span>'+CT('dsec')+'</span><span dir="ltr">'+usd(dreq)+'</span></div>';dr.forEach(function(r,i){h+='<div class="row'+(i%2?' z2':'')+(r.got>=r.req?' paid':'')+'"><span class="nm">'+r.l+(r.math?' <small style="color:var(--mut)" dir="ltr">'+r.math+'</small>':'')+'</span><span class="am" dir="ltr">'+usd(r.got)+' / '+usd(r.req)+'</span></div>'});h+='</section>'}
  h+='<section><div class="band" style="'+bstyle('Block '+BL())+'"><span>'+esc(CT('c'))+'</span><span dir="ltr">'+usd(sum)+'</span></div>';
  names.forEach(function(nm,i){var owed=0;cols.forEach(function(c){if(!isP(c,nm))owed+=ca(c,nm)});
@@ -181,7 +188,8 @@ function renderC(){var bc=D&&D.blockc;if(!bc){$('cpanel').innerHTML='';return}
  h+='</section>';
  $('cpanel').innerHTML=h;
  if($('cuo'))$('cuo').onclick=function(){$('uo').click();renderC()};Array.prototype.forEach.call($('cpanel').querySelectorAll('button.chip'),function(el){el.onclick=function(){tickX(+el.getAttribute('data-c'),+el.getAttribute('data-n'))}})}
-function tickX(ci,ni){var bc=D.blockc,c=bc.cols[ci],nm=bc.names[ni],k='c'+ci+'_'+ni;if(busy[k])return;
+function tickX(ci,ni){var bc=D.blockc,c=allCols(bc)[ci],nm=bc.names[ni],k='c'+ci+'_'+ni;if(busy[k])return;
+ if(c&&c._e){if(window.setH&&c._e.idx[nm]!=null)window.setH(c._e.h,c._e.idx[nm]);return}
  if(!bc.paid[c.pk]||typeof bc.paid[c.pk]!=='object')bc.paid[c.pk]={};
  var v=!bc.paid[c.pk][nm];busy[k]=1;if(v)bc.paid[c.pk][nm]=true;else delete bc.paid[c.pk][nm];renderC();
  function undo(){if(v)delete bc.paid[c.pk][nm];else bc.paid[c.pk][nm]=true;renderC()}
@@ -230,6 +238,7 @@ function renderHist(){
 }
 function setH(hi,i){var r=D.hist[hi];r.paid=r.paid||{};var v=!r.paid[i];if(v)r.paid[i]=1;else delete r.paid[i];if(r.diff)delete r.diff[i];render();
  google.script.run.withSuccessHandler(function(p){r.paid=p||{};render()}).withFailureHandler(function(){if(v)delete r.paid[i];else r.paid[i]=1;render();toast(T('nosave'))}).setPaidH(TOK,r.inv,i,v?1:0)}
+window.setH=setH;
 function setD(el){var h=el.getAttribute('data-dh'),i=+el.getAttribute('data-di'),ro=h==='c'?D:D.hist[+h];if(!ro)return;
  if(!confirm(LANG==='ar'?'هل تمت تسوية الفرق؟':'Mark this difference as settled?'))return;
  google.script.run.withSuccessHandler(function(m){ro.diff=m||{};render()}).withFailureHandler(function(e){toast((e&&e.message)||T('nosave'))}).setDiffOk(TOK,ro.inv||'',i)}
