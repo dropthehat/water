@@ -21,7 +21,7 @@
 /* Anas's page now lives here on GitHub; Apps Script ("Water Collect") only sends and saves the data.
    This small adapter gives the page the same google.script.run / google.script.url calls it used inside Apps Script,
    so the page code below is unchanged. A building rep's link (Block A split, Block B/C/D pages) still opens the Apps Script page. */
-var APPV='2026-11-01a';
+var APPV='2026-11-01b';
 (function(){
  var EXEC='https://script.google.com/macros/s/AKfycbw0aOri7KloAq29a1Mksi3w-JlOoP4EgYUpoBJlwdqmgKVh72xGGPlxY0j9SGYUIqnJUw/exec';
  var P=new URLSearchParams(location.search),K=P.get('k')||'',V=P.get('v')||'';
@@ -202,11 +202,38 @@ $('tw').onclick=function(){TAB='w';showTab();render();window.scrollTo(0,0)};$('t
 (function(){
 var css=document.createElement('style');css.textContent='#list.dn{filter:grayscale(1);opacity:.62}body.uo .row.paid.df{display:flex}.dfb{display:block;text-decoration:none;margin-top:4px;font-weight:700;font-size:12px;cursor:pointer}#rsw{display:grid;grid-template-columns:repeat(auto-fit,minmax(70px,1fr));gap:6px;padding:0 0 10px;margin-bottom:8px;border-bottom:1px solid var(--line)}#rsw button{min-width:0;border-radius:12px;padding:6px 4px;font:inherit;font-size:15px;font-weight:800;line-height:1.15;cursor:pointer;text-align:center}#rsw button small{display:block;font-size:11px;font-weight:600;opacity:.8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}body.sc #rsw{padding-bottom:6px;margin-bottom:6px}body.sc #rsw button{padding:4px}';document.head.appendChild(css);
 var _r2=render;
-render=function(){_r2.apply(this,arguments);try{renderHist()}catch(e){}};
+render=function(){try{navRestore();syncSel()}catch(e){}_r2.apply(this,arguments);try{renderHist()}catch(e){}try{navSave()}catch(e){}};
 var SEL=null;
 function left(r){var n=0,s=0;(r.rows||[]).forEach(function(x,i){if(x.k==='block'||x.k==='total'||x.k==='grand'||x.hid)return;if(!(r.paid&&r.paid[i])){n++;s+=num(x.a)}});return {n:n,s:s}}
 function isDone(r){return !!r&&left(r).n===0&&!Object.keys(r.diff||{}).length}
 function markDone(f){var l=$('list');if(l)l.classList.toggle('dn',!!f)}
+var SELINV=null,navDone=false;
+/* Which view is on screen (used for the per-invoice "Unpaid only" default). */
+window.wcView=function(){
+ if(TAB==='c')return {key:'c'+CURB,done:false};
+ if(!D)return {key:'',done:false};
+ if(SEL===-1||SEL===null)return {key:'W:'+(D.inv||''),done:!D.curHidden&&isDone(D)};
+ var r=D.hist&&D.hist[SEL];if(!r)return {key:'',done:false};
+ return {key:(r.kind==='edl'?'E:':'W:')+(r.inv||''),done:isDone(r)};
+};
+/* When the list changes (new data), stay on the same earlier invoice even if its position moved. */
+function syncSel(){if(!D||SEL===null||SEL===-1||!SELINV)return;var f=-1;(D.hist||[]).forEach(function(r,i){if(r.inv===SELINV)f=i});SEL=f>=0?f:null}
+/* Remember the tab, building and invoice, so a refresh opens the same page. */
+function navRestore(){
+ if(navDone||!D)return;navDone=true;
+ var n=null;try{n=JSON.parse(localStorage.getItem('wc_nav')||'null')}catch(e){}
+ if(!n||n.k!==TOK)return;
+ TAB=(n.tab==='c'||n.tab==='e')?n.tab:'w';
+ if(/^[A-D]$/.test(n.b||''))CURB=n.b;
+ if(n.cur){SEL=-1;SELINV=null}else if(n.inv){var f=-1;(D.hist||[]).forEach(function(r,i){if(r.inv===n.inv)f=i});if(f>=0){SEL=f;SELINV=n.inv}}
+}
+function navSave(){
+ if(!navDone||!D||!TOK)return;
+ var o={k:TOK,tab:TAB,b:CURB};
+ if(SEL===-1||SEL===null)o.cur=1;else if(SELINV)o.inv=SELINV;
+ try{localStorage.setItem('wc_nav',JSON.stringify(o))}catch(e){}
+}
+window.wcNavSave=navSave;
 function askUndo(){return confirm(LANG==='ar'?'هذه الفاتورة مدفوعة بالكامل. هل تريد تغيير الدفع؟':'This invoice is fully paid. Change this payment?')}
 function dfb(d,h,i){var ar=LANG==='ar',cs=(h!=='c'&&D.hist[+h]&&D.hist[+h].kind==='edl')?'$':'',t=d>0?(ar?'مطلوب إضافي ':'To collect +')+cs+nf(d):(ar?'للإرجاع ':'To return ')+cs+nf(-d);return '<small class="dfb" data-dh="'+h+'" data-di="'+i+'" style="color:'+(d>0?'var(--bad)':'#b45309')+'">'+(d>0?'⬆ ':'⬇ ')+t+' · '+(ar?'اضغط عند التسوية':'tap when settled')+'</small>'}
 function curBadges(){Array.prototype.forEach.call($('list').querySelectorAll('.row[data-i]:not([data-h])'),function(el){var i=+el.getAttribute('data-i'),d=D.diff&&D.diff[i];if(d){el.classList.add('df');var nm=el.querySelector('.nm');if(nm)nm.insertAdjacentHTML('beforeend',dfb(d,'c',i))}})}
@@ -214,10 +241,11 @@ function renderHist(){
  if(!D)return;
  var ar=LANG==='ar',sw=$('rsw');
  var onE=TAB==='e',hv=ensureHv().filter(function(h){return (D.hist[h].kind==='edl')===onE}),cur=!D.curHidden&&!onE;
- if(!sw){sw=document.createElement('div');sw.id='rsw';sw.onclick=function(e){var b=e.target.closest?e.target.closest('button'):null;if(!b)return;var s=+b.getAttribute('data-s');if(s===SEL)return;SEL=s;render();window.scrollTo(0,0)};var tp=$('top');tp.insertBefore(sw,tp.firstChild)}
+ if(!sw){sw=document.createElement('div');sw.id='rsw';sw.onclick=function(e){var b=e.target.closest?e.target.closest('button'):null;if(!b)return;var s=+b.getAttribute('data-s');if(s===SEL)return;SEL=s;SELINV=(s>=0&&D.hist[s])?D.hist[s].inv:null;render();window.scrollTo(0,0)};var tp=$('top');tp.insertBefore(sw,tp.firstChild)}
  if(SEL!==null&&SEL!==-1&&hv.indexOf(SEL)<0)SEL=null;
  if(SEL===-1&&!cur)SEL=null;
  if(SEL===null)SEL=cur?-1:(hv.length?hv[0]:-1);
+ SELINV=(SEL>=0&&D.hist[SEL])?D.hist[SEL].inv:null;
  function pill(s,t,dn){var on=SEL===s;return '<button data-s="'+s+'" style="border:1px solid '+(on?'var(--band)':'var(--line)')+';background:'+(on?'var(--band)':'var(--card)')+';color:'+(on?'#fff':'var(--ink)')+(dn&&!on?';opacity:.55':'')+'">'+t+'</button>'}
  function lab(no,n,c){var k=n?(ar?n+' متبقٍ':n+' left'):'✓';return '<span dir="ltr">'+esc(no)+'</span><small>'+(c?(ar?'الحالية · ':'Current · '):'')+k+'</small>'}
  var ph=cur?pill(-1,lab(D.inv||(ar?'الحالية':'Current'),left(D).n,1),isDone(D)):'';
@@ -288,13 +316,19 @@ $('list').onclick=function(e){var db=e.target.closest?e.target.closest('.dfb'):n
 })();
 </script>
 <script>
-(function(){var on=false;try{on=localStorage.getItem('wc_uo')==='1'}catch(e){}
+/* "Unpaid only" is remembered per invoice (per building on the Block tabs). Until you change it, a fully paid invoice opens on
+   "Unpaid only" (so it shows "Everyone has paid") and every other view opens on "Show all". */
+(function(){var on=false,MAP={};try{MAP=JSON.parse(localStorage.getItem('wc_uo2')||'{}')||{}}catch(e){}
+function view(){return window.wcView?window.wcView():{key:'',done:false}}
+function isOn(v){return Object.prototype.hasOwnProperty.call(MAP,v.key)?!!MAP[v.key]:!!v.done}
 function L(){return document.documentElement.lang==='ar'}
-function upd(){var b=document.getElementById('uo');if(!b)return;document.body.classList.toggle('uo',on);b.className=on?'on':'';b.textContent=on?(L()?'عرض الكل':'Show all'):(L()?'غير المدفوعين فقط':'Unpaid only');
+function upd(){var b=document.getElementById('uo');if(!b)return;on=isOn(view());document.body.classList.toggle('uo',on);b.className=on?'on':'';b.textContent=on?(L()?'عرض الكل':'Show all'):(L()?'غير المدفوعين فقط':'Unpaid only');
+ var cu=document.getElementById('cuo');if(cu)cu.textContent=b.textContent;
  document.getElementById('wl').textContent=L()?'📣 = إرسال تذكير واتساب':'📣 = send WhatsApp reminder';
  var rows=document.querySelectorAll('#list .row:not(.paid)');document.body.classList.toggle('alldone',on&&!rows.length);document.getElementById('uoE').textContent=L()?'الجميع دفع ✅':'Everyone has paid ✅'}
-document.getElementById('uo').onclick=function(){on=!on;try{localStorage.setItem('wc_uo',on?'1':'0')}catch(e){}upd()};
+document.getElementById('uo').onclick=function(){var v=view();on=!isOn(v);MAP[v.key]=on?1:0;var ks=Object.keys(MAP);while(ks.length>40){delete MAP[ks.shift()]}try{localStorage.setItem('wc_uo2',JSON.stringify(MAP))}catch(e){}upd()};
 document.getElementById('lg').addEventListener('click',function(){setTimeout(upd,0)});
+document.getElementById('tabs').addEventListener('click',function(){setTimeout(function(){upd();if(window.wcNavSave)window.wcNavSave()},0)});
 var o=window.render;if(typeof o==='function'){window.render=function(){var r=o.apply(this,arguments);upd();return r}}
 upd()})();
 </script>
