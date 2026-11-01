@@ -21,7 +21,7 @@
 /* Anas's page now lives here on GitHub; Apps Script ("Water Collect") only sends and saves the data.
    This small adapter gives the page the same google.script.run / google.script.url calls it used inside Apps Script,
    so the page code below is unchanged. A building rep's link (Block A split, Block B/C/D pages) still opens the Apps Script page. */
-var APPV='2026-10-31b';
+var APPV='2026-11-01a';
 (function(){
  var EXEC='https://script.google.com/macros/s/AKfycbw0aOri7KloAq29a1Mksi3w-JlOoP4EgYUpoBJlwdqmgKVh72xGGPlxY0j9SGYUIqnJUw/exec';
  var P=new URLSearchParams(location.search),K=P.get('k')||'',V=P.get('v')||'';
@@ -137,7 +137,7 @@ google.script.url.getLocation(function(loc){
 
 /* ---- Building tabs (A, B, C, D) ---- */
 var TAB='w',CURB='C';
-function ensureHv(){if(!D)return [];if(!D.hv){D.hv=[];(D.hist||[]).forEach(function(r,hi){var un=0;(r.rows||[]).forEach(function(x,i){if(x.k!=='block'&&x.k!=='total'&&x.k!=='grand'&&!(r.paid&&r.paid[i]))un++});if(un||Object.keys(r.diff||{}).length)D.hv.push(hi)})}return D.hv}
+function ensureHv(){if(!D)return [];if(!D.hv){D.hv=[];(D.hist||[]).forEach(function(r,hi){var un=0;(r.rows||[]).forEach(function(x,i){if(x.k!=='block'&&x.k!=='total'&&x.k!=='grand'&&!(r.paid&&r.paid[i]))un++});if(r.kind!=='edl'||un||Object.keys(r.diff||{}).length)D.hv.push(hi)})}return D.hv}
 function edlOpen(){return ensureHv().some(function(h){return D.hist[h].kind==='edl'})}
 function BL(){return CURB||'C'}
 function bldList(){var b=(D&&D.bld)||{};return ['A','B','C','D'].filter(function(L){return b[L]})}
@@ -200,10 +200,14 @@ $('tw').onclick=function(){TAB='w';showTab();render();window.scrollTo(0,0)};$('t
 
 // ---- invoices: tabs for the current round and earlier rounds still open; paid-amount differences ----
 (function(){
-var css=document.createElement('style');css.textContent='body.uo .row.paid.df{display:flex}.dfb{display:block;text-decoration:none;margin-top:4px;font-weight:700;font-size:12px;cursor:pointer}#rsw{display:grid;grid-template-columns:repeat(auto-fit,minmax(70px,1fr));gap:6px;padding:0 0 10px;margin-bottom:8px;border-bottom:1px solid var(--line)}#rsw button{min-width:0;border-radius:12px;padding:6px 4px;font:inherit;font-size:15px;font-weight:800;line-height:1.15;cursor:pointer;text-align:center}#rsw button small{display:block;font-size:11px;font-weight:600;opacity:.8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}body.sc #rsw{padding-bottom:6px;margin-bottom:6px}body.sc #rsw button{padding:4px}';document.head.appendChild(css);
+var css=document.createElement('style');css.textContent='#list.dn{filter:grayscale(1);opacity:.62}body.uo .row.paid.df{display:flex}.dfb{display:block;text-decoration:none;margin-top:4px;font-weight:700;font-size:12px;cursor:pointer}#rsw{display:grid;grid-template-columns:repeat(auto-fit,minmax(70px,1fr));gap:6px;padding:0 0 10px;margin-bottom:8px;border-bottom:1px solid var(--line)}#rsw button{min-width:0;border-radius:12px;padding:6px 4px;font:inherit;font-size:15px;font-weight:800;line-height:1.15;cursor:pointer;text-align:center}#rsw button small{display:block;font-size:11px;font-weight:600;opacity:.8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}body.sc #rsw{padding-bottom:6px;margin-bottom:6px}body.sc #rsw button{padding:4px}';document.head.appendChild(css);
 var _r2=render;
 render=function(){_r2.apply(this,arguments);try{renderHist()}catch(e){}};
 var SEL=null;
+function left(r){var n=0,s=0;(r.rows||[]).forEach(function(x,i){if(x.k==='block'||x.k==='total'||x.k==='grand'||x.hid)return;if(!(r.paid&&r.paid[i])){n++;s+=num(x.a)}});return {n:n,s:s}}
+function isDone(r){return !!r&&left(r).n===0&&!Object.keys(r.diff||{}).length}
+function markDone(f){var l=$('list');if(l)l.classList.toggle('dn',!!f)}
+function askUndo(){return confirm(LANG==='ar'?'هذه الفاتورة مدفوعة بالكامل. هل تريد تغيير الدفع؟':'This invoice is fully paid. Change this payment?')}
 function dfb(d,h,i){var ar=LANG==='ar',cs=(h!=='c'&&D.hist[+h]&&D.hist[+h].kind==='edl')?'$':'',t=d>0?(ar?'مطلوب إضافي ':'To collect +')+cs+nf(d):(ar?'للإرجاع ':'To return ')+cs+nf(-d);return '<small class="dfb" data-dh="'+h+'" data-di="'+i+'" style="color:'+(d>0?'var(--bad)':'#b45309')+'">'+(d>0?'⬆ ':'⬇ ')+t+' · '+(ar?'اضغط عند التسوية':'tap when settled')+'</small>'}
 function curBadges(){Array.prototype.forEach.call($('list').querySelectorAll('.row[data-i]:not([data-h])'),function(el){var i=+el.getAttribute('data-i'),d=D.diff&&D.diff[i];if(d){el.classList.add('df');var nm=el.querySelector('.nm');if(nm)nm.insertAdjacentHTML('beforeend',dfb(d,'c',i))}})}
 function renderHist(){
@@ -214,12 +218,12 @@ function renderHist(){
  if(SEL!==null&&SEL!==-1&&hv.indexOf(SEL)<0)SEL=null;
  if(SEL===-1&&!cur)SEL=null;
  if(SEL===null)SEL=cur?-1:(hv.length?hv[0]:-1);
- function left(r){var n=0,s=0;(r.rows||[]).forEach(function(x,i){if(x.k==='block'||x.k==='total'||x.k==='grand'||x.hid)return;if(!(r.paid&&r.paid[i])){n++;s+=num(x.a)}});return {n:n,s:s}}
- function pill(s,t){var on=SEL===s;return '<button data-s="'+s+'" style="border:1px solid '+(on?'var(--band)':'var(--line)')+';background:'+(on?'var(--band)':'var(--card)')+';color:'+(on?'#fff':'var(--ink)')+'">'+t+'</button>'}
+ function pill(s,t,dn){var on=SEL===s;return '<button data-s="'+s+'" style="border:1px solid '+(on?'var(--band)':'var(--line)')+';background:'+(on?'var(--band)':'var(--card)')+';color:'+(on?'#fff':'var(--ink)')+(dn&&!on?';opacity:.55':'')+'">'+t+'</button>'}
  function lab(no,n,c){var k=n?(ar?n+' متبقٍ':n+' left'):'✓';return '<span dir="ltr">'+esc(no)+'</span><small>'+(c?(ar?'الحالية · ':'Current · '):'')+k+'</small>'}
- var ph=cur?pill(-1,lab(D.inv||(ar?'الحالية':'Current'),left(D).n,1)):'';
- hv.forEach(function(hi){var r=D.hist[hi];ph+=pill(hi,lab((r.kind==='edl'?'\u26A1 ':'')+(r.inv||r.period||''),left(r).n,0))});
+ var ph=cur?pill(-1,lab(D.inv||(ar?'الحالية':'Current'),left(D).n,1),isDone(D)):'';
+ hv.forEach(function(hi){var r=D.hist[hi];ph+=pill(hi,lab((r.kind==='edl'?'\u26A1 ':'')+(r.inv||r.period||''),left(r).n,0),isDone(r))});
  sw.innerHTML=ph;sw.style.display=((cur?1:0)+hv.length)>1?'flex':'none';
+ markDone(SEL===-1?(cur&&isDone(D)):isDone(D.hist[SEL]));
  if(SEL===-1&&cur){$('grand').style.display='';$('uoE').style.display='';curBadges();return}
  if(SEL===-1){$('list').innerHTML='<div class="msg">'+(ar?'لا توجد فواتير مياه مفتوحة حالياً':'No open water invoices right now')+'</div>';$('grand').style.display='none';$('uoE').style.display='none';$('top').style.display='none';return}
  var r=D.hist[SEL],df=r.diff||{},h='',open=false,ms=function(a){return r.kind==='edl'&&a?'$'+a:a},z=0,sum=0,got=0,n=0,np=0,grand='',tt={},cb='';
@@ -244,7 +248,7 @@ function setD(el){var h=el.getAttribute('data-dh'),i=+el.getAttribute('data-di')
  google.script.run.withSuccessHandler(function(m){ro.diff=m||{};render()}).withFailureHandler(function(e){toast((e&&e.message)||T('nosave'))}).setDiffOk(TOK,ro.inv||'',i)}
 $('list').onclick=function(e){var db=e.target.closest?e.target.closest('.dfb'):null;if(db){e.preventDefault();setD(db);return}
  var el=e.target.closest?e.target.closest('.row'):null;if(!el)return;if(e.target.tagName==='INPUT')e.preventDefault();var i=+el.getAttribute('data-i');
- if(el.hasAttribute('data-h')){setH(+el.getAttribute('data-h'),i)}else{if(D.diff)delete D.diff[i];setP(i,D.paid[i]?0:1)}};
+ if(el.hasAttribute('data-h')){var hh=+el.getAttribute('data-h');if(isDone(D.hist[hh])&&!askUndo())return;setH(hh,i)}else{if(isDone(D)&&!askUndo())return;if(D.diff)delete D.diff[i];setP(i,D.paid[i]?0:1)}};
 })();
 </script>
 <script>
