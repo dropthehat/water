@@ -21,7 +21,7 @@
 /* Anas's page now lives here on GitHub; Apps Script ("Water Collect") only sends and saves the data.
    This small adapter gives the page the same google.script.run / google.script.url calls it used inside Apps Script,
    so the page code below is unchanged. A building rep's link (Block A split, Block B/C/D pages) still opens the Apps Script page. */
-var APPV='2026-11-04e';
+var APPV='2026-11-04f';
 (function(){
  var EXEC='https://script.google.com/macros/s/AKfycbw0aOri7KloAq29a1Mksi3w-JlOoP4EgYUpoBJlwdqmgKVh72xGGPlxY0j9SGYUIqnJUw/exec';
  var P=new URLSearchParams(location.search),K=P.get('k')||'',V=P.get('v')||'';
@@ -108,7 +108,7 @@ function fillTop(o){
  $('lcol').textContent=o.kind==='edl'?(LANG==='ar'?'دولار تم تحصيله':'USD collected'):T('col');var cs=o.kind==='edl'?'$':'';$('got').textContent=cs+nf(o.got);var rmn=Math.round((o.sum-o.got)*100)/100;$('rem').textContent=cs+nf(rmn);$('rem').style.color=(rmn>0?'':'#16a34a');$('cnt').textContent=T('paid',o.np,o.n);
  $('pb').style.width=(o.sum?Math.min(100,o.got/o.sum*100):0)+'%';
 }
-window.setP=function(i,v){return setP(i,v)};
+var _setP0=setP;window.setP=function(i,v){return _setP0(i,v)};
 function setP(i,v){
  if(v)D.paid[i]=1;else delete D.paid[i];busy[i]=1;render();
  google.script.run.withSuccessHandler(function(p){delete busy[i];D.paid=p;render()}).withFailureHandler(function(e){delete busy[i];if(v)delete D.paid[i];else D.paid[i]=1;render();toast(T('nosave'))}).setPaid(TOK,i,v);
