@@ -21,7 +21,7 @@
 /* Anas's page now lives here on GitHub; Apps Script ("Water Collect") only sends and saves the data.
    This small adapter gives the page the same google.script.run / google.script.url calls it used inside Apps Script,
    so the page code below is unchanged. A building rep's link (Block A split, Block B/C/D pages) still opens the Apps Script page. */
-var APPV='2026-11-04d';
+var APPV='2026-11-04e';
 (function(){
  var EXEC='https://script.google.com/macros/s/AKfycbw0aOri7KloAq29a1Mksi3w-JlOoP4EgYUpoBJlwdqmgKVh72xGGPlxY0j9SGYUIqnJUw/exec';
  var P=new URLSearchParams(location.search),K=P.get('k')||'',V=P.get('v')||'';
@@ -179,17 +179,17 @@ function renderC(){var bc=D&&D.blockc;if(!bc){$('cpanel').innerHTML='';return}
  var B=0;(bc.bills||[]).forEach(function(b){B+=b.a});
  var dr=[];
  if(B>0)dr.push({l:CT('bpool'),req:B,got:maintCol?Math.min(colGot(maintCol),B):0});
- cols.forEach(function(c){if(c===maintCol||c._e||c._w)return;dr.push({l:cname(c),req:colSum(c),got:colGot(c),math:(c.ov&&Object.keys(c.ov).length)?'':usd(c.a)+' \u00d7 '+n})});
+ cols.forEach(function(c){if(c===maintCol||c._e||c._w||c.t)return;dr.push({l:cname(c),req:colSum(c),got:colGot(c),math:(c.ov&&Object.keys(c.ov).length)?'':usd(c.a)+' \u00d7 '+n})});
  var dreq=0,dgot=0;dr.forEach(function(r){dreq+=r.req;dgot+=r.got});var dp=dreq?Math.round(dgot*100/dreq):0;
  var cnt=LANG==='ar'?('سدّد '+settled+' من '+n):(settled+' of '+n+' '+CT('stl'));
  var h='<div class="top"><div class="t1"><b>'+esc(CT('c'))+'</b><span><bdi>'+esc(bc.month)+'</bdi></span></div><div class="big"><span dir="ltr">'+usd(got)+'</span> <small>'+CT('col')+'</small></div><div class="bar"><i style="width:'+pct+'%"></i></div><div class="sub"><span>'+cnt+'</span><span>'+CT('rem')+' <b dir="ltr" class="'+(sum-got>0?'rd':'rz')+'">'+usd(sum-got)+'</b></span></div>'+(dr.length?'<div class="sub" style="margin-top:8px"><span>'+CT('dcov')+'</span><span dir="ltr"><b>'+usd(dgot)+'</b> / '+usd(dreq)+'</span></div><div class="bar"><i style="width:'+dp+'%"></i></div>':'')+edlh+'<div class="cflt"><button id="cuo">'+esc(($('uo')&&$('uo').textContent)||'')+'</button></div></div>';
  if(false){h+='<section style="margin-bottom:14px"><div class="band"><span>'+CT('dsec')+'</span><span dir="ltr">'+usd(dreq)+'</span></div>';dr.forEach(function(r,i){h+='<div class="row'+(i%2?' z2':'')+(r.got>=r.req?' paid':'')+'"><span class="nm">'+r.l+(r.math?' <small style="color:var(--mut)" dir="ltr">'+r.math+'</small>':'')+'</span><span class="am" dir="ltr">'+usd(r.got)+' / '+usd(r.req)+'</span></div>'});h+='</section>'}
  h+='<section><div class="band" style="'+bstyle('Block '+BL())+'"><span>'+esc(CT('c'))+'</span><span dir="ltr">'+usd(sum)+'</span></div>';
  names.forEach(function(nm,i){var owed=0;cols.forEach(function(c){if(!isP(c,nm))owed+=ca(c,nm)});
-  h+='<div class="apt'+(i%2?' z2':'')+(owed>0?'':' paid')+'"><div class="ah"><span class="nm">'+esc(nm)+(bc.nameAr&&bc.nameAr[nm]?' <bdi><small style="color:var(--mut)">'+esc(bc.nameAr[nm])+'</small></bdi>':'')+'</span><span class="am" dir="ltr" style="color:var(--'+(owed>0?'bad':'ok')+')">'+(owed>0?usd(owed):'\u2713')+'</span></div><div class="chips">'+cols.map(function(c,ci){if(!(ca(c,nm)>0))return '';return '<button class="chip'+(isP(c,nm)?' on':'')+'" data-c="'+ci+'" data-n="'+i+'">'+cname(c)+' <span dir="ltr">'+usd(ca(c,nm))+'</span></button>'}).join('')+'</div></div>'});
+  h+='<div class="apt'+(i%2?' z2':'')+(owed>0?'':' paid')+'"><div class="ah"><span class="nm">'+esc(nm)+(bc.nameAr&&bc.nameAr[nm]?' <bdi><small style="color:var(--mut)">'+esc(bc.nameAr[nm])+'</small></bdi>':'')+'</span><span class="am" dir="ltr" style="color:var(--'+(owed>0?'bad':'ok')+')">'+(owed>0?usd(owed):'\u2713')+'</span></div><div class="chips">'+cols.map(function(c,ci){if(c.t)return '<button class="chip'+(isP(c,nm)?' on':'')+'" data-c="'+ci+'" data-n="'+i+'">'+cname(c)+'</button>';if(!(ca(c,nm)>0))return '';return '<button class="chip'+(isP(c,nm)?' on':'')+'" data-c="'+ci+'" data-n="'+i+'">'+cname(c)+' <span dir="ltr">'+usd(ca(c,nm))+'</span></button>'}).join('')+'</div></div>'});
  h+='</section>';
  if(cols.length){h+='<section style="margin-top:14px"><div class="band"><span>'+CT('bych')+'</span><span></span></div>';
-  cols.forEach(function(c,i){var k=0;names.forEach(function(nm){if(isP(c,nm))k++});var mh=(c===maintCol)?(B>0?usd(B)+' '+(LANG==='ar'?'للفواتير':'for bills'):''):((c.ov&&Object.keys(c.ov).length)?'':usd(c.a)+' \u00d7 '+n);h+='<div class="row'+(i%2?' z2':'')+'"><span class="nm">'+cname(c)+(mh?' <small style="color:var(--mut)" dir="ltr">'+mh+'</small>':'')+'</span><span class="am" dir="ltr">'+usd(colGot(c))+' / '+usd(colSum(c))+'</span></div>'});
+  cols.forEach(function(c,i){var k=0;names.forEach(function(nm){if(isP(c,nm))k++});var mh=c.t?'':(c===maintCol)?(B>0?usd(B)+' '+(LANG==='ar'?'للفواتير':'for bills'):''):((c.ov&&Object.keys(c.ov).length)?'':usd(c.a)+' \u00d7 '+n);h+='<div class="row'+(i%2?' z2':'')+'"><span class="nm">'+cname(c)+(mh?' <small style="color:var(--mut)" dir="ltr">'+mh+'</small>':'')+'</span><span class="am" dir="ltr">'+(c.t?k+' / '+n:usd(colGot(c))+' / '+usd(colSum(c)))+'</span></div>'});
   h+='</section>'}
  var bl=bc.bills||[];h+='<section style="margin-top:14px"><div class="band"><span>'+CT('bills')+'</span><span></span></div>';
  if(!bl.length)h+='<div class="msg">'+CT('none')+'</div>';
@@ -434,6 +434,7 @@ upd()})();
   var pA='',pE='',lA='',lE='',tp=0,tl=0;
   cols.forEach(function(c){
    var a=(c.ov&&c.ov[nm]!=null)?c.ov[nm]:c.a;
+   if(c.t){if(window.bcPaidC(c,nm,bc)){pA+='• '+(c.la||c.l)+' ✅\n';pE+='• '+c.l+' ✅\n'}return}
    if(!(a>0))return;
    var ar=c.la||c.l, en=c.l;
    var lb=(c.lbp&&c.lbp[nm])?' ('+nf(Math.round(c.lbp[nm]))+' LBP)':'';
