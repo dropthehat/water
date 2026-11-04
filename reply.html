@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>بنايتنا · Our Building</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<style>
+:root{--bg:#f1f5fd;--card:#fff;--ink:#0f1b3d;--mut:#5b6784;--line:#d9e1f2;--acc:#2f6fe4;--ok:#15803d;--bad:#b91c1c}
+@media(prefers-color-scheme:dark){:root{--bg:#0e1424;--card:#172036;--ink:#eaf0ff;--mut:#9fb0d6;--line:#2a3757;--acc:#6ea1ff;--ok:#4ade80;--bad:#f87171}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 -apple-system,"Segoe UI",system-ui,sans-serif}
+.w{max-width:520px;margin:0 auto;padding:16px}
+.brand{display:flex;align-items:center;gap:6px;color:var(--acc);font-weight:700;font-size:13px;margin:4px 0 12px}
+h1{font-size:24px;margin:0 0 2px}.sub{color:var(--mut);margin:0 0 14px;font-size:15px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;margin-bottom:12px}
+.card h2{font-size:15px;margin:0 0 10px;color:var(--acc)}
+label{display:block;font-weight:600;font-size:14px;margin:10px 0 4px}label small{color:var(--mut);font-weight:400}
+input[type=text],input[type=tel],input[type=number]{width:100%;font:inherit;padding:12px;border:1px solid var(--line);border-radius:12px;background:var(--bg);color:var(--ink)}
+input[type=tel],input[type=number]{direction:ltr;text-align:left}
+.seg{display:flex;gap:8px;flex-wrap:wrap}
+.seg label{margin:0;flex:1;min-width:70px}
+.seg input{position:absolute;opacity:0;pointer-events:none}
+.seg span{display:block;text-align:center;padding:12px 8px;border:1px solid var(--line);border-radius:12px;background:var(--bg);font-weight:600;cursor:pointer}
+.seg input:checked+span{background:var(--acc);border-color:var(--acc);color:#fff}
+.seg input:focus-visible+span{outline:2px solid var(--acc);outline-offset:2px}
+.row2{display:flex;gap:8px}.row2>div{flex:1}
+button.go{width:100%;font:inherit;font-weight:700;font-size:17px;padding:14px;border:0;border-radius:14px;background:var(--acc);color:#fff;cursor:pointer;margin-top:4px}
+button.go:disabled{opacity:.6}
+.hp{position:absolute;top:0;left:0;width:1px;height:1px;overflow:hidden;opacity:0;pointer-events:none}
+.err{color:var(--bad);font-weight:600;margin:8px 0 0;min-height:1.2em}
+.done{text-align:center;padding:26px 10px}.done b{display:block;font-size:22px;color:var(--ok);margin-bottom:6px}
+.note{color:var(--mut);font-size:13px;margin:6px 2px 0}
+</style>
+</head>
+<body>
+<div class="w">
+ <div class="brand"><svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true"><path d="M12 2.5C8 7.6 5.5 11 5.5 14.5a6.5 6.5 0 0 0 13 0C18.5 11 16 7.6 12 2.5z" fill="currentColor"/></svg><span>بنايتنا · Our Building</span></div>
+ <div id="form">
+  <h1>معلوماتكم لفاتورة وإيصال أوضح</h1>
+  <p class="sub">Your details for a clearer bill and receipt</p>
+  <form id="f" autocomplete="off" novalidate>
+   <div class="card">
+    <h2>الشقة · Apartment</h2>
+    <label>البلوك · Block</label>
+    <div class="seg" id="blk">
+     <label><input type="radio" name="block" value="A"><span>A</span></label>
+     <label><input type="radio" name="block" value="B"><span>B</span></label>
+     <label><input type="radio" name="block" value="C"><span>C</span></label>
+     <label><input type="radio" name="block" value="D"><span>D</span></label>
+    </div>
+    <label>اسمكم أو الشقة · Your name or apartment</label>
+    <input type="text" name="apt" maxlength="60" dir="auto" placeholder="مثال: Tony Moussa">
+   </div>
+   <div class="card">
+    <h2>رقم الهاتف · Phone</h2>
+    <label>الرقم المفضّل · Preferred number</label>
+    <input type="tel" name="p1" inputmode="tel" maxlength="20" placeholder="03 123 456">
+    <label>رقم ثانٍ <small>(اختياري · optional)</small></label>
+    <input type="tel" name="p2" inputmode="tel" maxlength="20" placeholder="70 123 456">
+    <p class="note">أرقام لبنان بدون رمز الدولة، وأرقام الخارج تبدأ بـ +<br><span dir="ltr" style="display:block;text-align:right">Lebanese numbers without country code; foreign numbers start with +</span></p>
+   </div>
+   <div class="card">
+    <h2>اللغة · Language</h2>
+    <div class="seg" id="lg">
+     <label><input type="radio" name="lg" value="ar"><span>عربي</span></label>
+     <label><input type="radio" name="lg" value="en"><span>English</span></label>
+     <label><input type="radio" name="lg" value="both" checked><span>الاثنان · Both</span></label>
+    </div>
+   </div>
+   <div class="card">
+    <h2>اشتراكات ثابتة <small style="color:var(--mut);font-weight:400">· Fixed charges (optional)</small></h2>
+    <div class="row2">
+     <div><label>الدش · Dish <small>$ / شهر</small></label><input type="number" name="dish" inputmode="decimal" min="0" step="any" placeholder="0"></div>
+     <div><label>الإنترنت · Internet <small>$ / شهر</small></label><input type="number" name="net" inputmode="decimal" min="0" step="any" placeholder="0"></div>
+    </div>
+    <label>أخرى · Other <small>(مولّد خاص… · private generator…)</small></label>
+    <input type="text" name="other" maxlength="120" dir="auto">
+   </div>
+   <div class="hp" aria-hidden="true"><label>Leave empty <input type="text" name="hp" tabindex="-1" autocomplete="off"></label></div>
+   <div class="err" id="err" role="alert"></div>
+   <button class="go" id="go" type="submit">إرسال · Send</button>
+   <p class="note">تصل المعلومات إلى الإدارة فقط<br><span dir="ltr" style="display:block;text-align:right">Your answer goes to the building manager only.</span></p>
+  </form>
+ </div>
+ <div id="ok" class="card done" hidden><b>شكراً لكم ✓</b>Thank you ✓<p class="note">وصلتنا معلوماتكم · We received your details.</p></div>
+</div>
+<script>
+var EXEC='https://script.google.com/macros/s/AKfycbw0aOri7KloAq29a1Mksi3w-JlOoP4EgYUpoBJlwdqmgKVh72xGGPlxY0j9SGYUIqnJUw/exec';
+var f=document.getElementById('f'),err=document.getElementById('err'),go=document.getElementById('go');
+function val(n){var e=f.elements[n];return e&&e.value!=null?String(e.value).trim():''}
+function digits(s){return s.replace(/\D/g,'')}
+f.addEventListener('submit',function(ev){
+ ev.preventDefault();err.textContent='';
+ var b=(f.querySelector('input[name=block]:checked')||{}).value||'',lg=(f.querySelector('input[name=lg]:checked')||{}).value||'both';
+ if(!b){err.textContent='اختاروا البلوك · Choose your block';return}
+ if(!val('apt')){err.textContent='اكتبوا اسمكم أو الشقة · Enter your name or apartment';return}
+ if(digits(val('p1')).length<7){err.textContent='أدخلوا رقماً صحيحاً · Enter a valid phone number';return}
+ if(val('p2')&&digits(val('p2')).length<7){err.textContent='الرقم الثاني غير صحيح · The second number looks wrong';return}
+ var body={action:'reply',block:b,apt:val('apt'),p1:val('p1'),p2:val('p2'),lg:lg,dish:val('dish'),net:val('net'),other:val('other'),hp:val('hp')};
+ go.disabled=true;
+ fetch(EXEC,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(body),redirect:'follow'})
+  .then(function(r){return r.json()})
+  .then(function(j){
+   if(j&&j.ok){document.getElementById('form').hidden=true;document.getElementById('ok').hidden=false;window.scrollTo(0,0)}
+   else{go.disabled=false;err.textContent=(j&&j.error==='phone')?'رقم الهاتف غير صحيح · Phone number looks wrong':'تعذّر الإرسال، حاولوا لاحقاً · Could not send, please try again'}
+  })
+  .catch(function(){go.disabled=false;err.textContent='تعذّر الإرسال، تحققوا من الاتصال · Could not send, check your connection'});
+});
+</script>
+</body>
+</html>
