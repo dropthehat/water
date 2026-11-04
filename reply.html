@@ -16,7 +16,7 @@ h1{font-size:24px;margin:0 0 2px}.sub{color:var(--mut);margin:0 0 14px;font-size
 .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;margin-bottom:12px}
 .card h2{font-size:15px;margin:0 0 10px;color:var(--acc)}
 label{display:block;font-weight:600;font-size:14px;margin:10px 0 4px}label small{color:var(--mut);font-weight:400}
-input[type=text],input[type=tel],input[type=number]{width:100%;font:inherit;padding:12px;border:1px solid var(--line);border-radius:12px;background:var(--bg);color:var(--ink)}
+select,input[type=text],input[type=tel],input[type=number]{width:100%;font:inherit;padding:12px;border:1px solid var(--line);border-radius:12px;background:var(--bg);color:var(--ink)}
 input[type=tel],input[type=number]{direction:ltr;text-align:left}
 .seg{display:flex;gap:8px;flex-wrap:wrap}
 .seg label{margin:0;flex:1;min-width:70px}
@@ -41,16 +41,15 @@ button.go:disabled{opacity:.6}
   <p class="sub">Your details for a clearer bill and receipt</p>
   <form id="f" autocomplete="off" novalidate>
    <div class="card">
-    <h2>الشقة · Apartment</h2>
-    <label>البلوك · Block</label>
-    <div class="seg" id="blk">
-     <label><input type="radio" name="block" value="A"><span>A</span></label>
-     <label><input type="radio" name="block" value="B"><span>B</span></label>
-     <label><input type="radio" name="block" value="C"><span>C</span></label>
-     <label><input type="radio" name="block" value="D"><span>D</span></label>
+    <h2>الشقة · Apartment <small style="color:var(--mut);font-weight:400">— البلوك C · Block C</small></h2>
+    <label for="who">اختاروا اسمكم · Select your name</label>
+    <select id="who" name="who"><option value="">…</option></select>
+    <div id="nm" hidden>
+     <label for="nen">الاسم بالإنجليزية · Name in English <small>(عدّلوه إن لزم · edit if needed)</small></label>
+     <input type="text" id="nen" name="nen" maxlength="60" dir="ltr" placeholder="Example: Jane Smith">
+     <label for="nar">الاسم بالعربية · Name in Arabic <small>(عدّلوه إن لزم · edit if needed)</small></label>
+     <input type="text" id="nar" name="nar" maxlength="60" dir="rtl" placeholder="مثال: جين سميث">
     </div>
-    <label>اسمكم أو الشقة · Your name or apartment</label>
-    <input type="text" name="apt" maxlength="60" dir="auto" placeholder="مثال: Tony Moussa">
    </div>
    <div class="card">
     <h2>رقم الهاتف · Phone</h2>
@@ -87,17 +86,33 @@ button.go:disabled{opacity:.6}
 </div>
 <script>
 var EXEC='https://script.google.com/macros/s/AKfycbw0aOri7KloAq29a1Mksi3w-JlOoP4EgYUpoBJlwdqmgKVh72xGGPlxY0j9SGYUIqnJUw/exec';
+var who=document.getElementById('who'),nmBox=document.getElementById('nm'),NAMES={};
+who.disabled=true;
+fetch(EXEC,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'replyNames'}),redirect:'follow'})
+ .then(function(r){return r.json()})
+ .then(function(j){
+  var l=(j&&j.list)||[];l.sort(function(a,b){return a.en.localeCompare(b.en)});
+  var h='<option value="">اختاروا · Choose…</option>';
+  l.forEach(function(x){if(!x.id)return;NAMES[x.id]=x;var o=document.createElement('option');o.value=x.id;o.textContent=x.en;who.appendChild(o)});
+  var o2=document.createElement('option');o2.value='other';o2.textContent='اسمي غير موجود · My name is not in the list';who.appendChild(o2);
+  who.options[0].textContent='اختاروا · Choose…';who.disabled=false;
+ })
+ .catch(function(){who.options[0].textContent='تعذّر التحميل · Could not load the list';err.textContent='تعذّر تحميل الأسماء، أعيدوا فتح الصفحة · Could not load names, reload the page'});
+who.addEventListener('change',function(){
+ var x=NAMES[who.value];nmBox.hidden=!who.value;
+ document.getElementById('nen').value=x?x.en:'';document.getElementById('nar').value=x?x.ar:'';
+});
 var f=document.getElementById('f'),err=document.getElementById('err'),go=document.getElementById('go');
 function val(n){var e=f.elements[n];return e&&e.value!=null?String(e.value).trim():''}
 function digits(s){return s.replace(/\D/g,'')}
 f.addEventListener('submit',function(ev){
  ev.preventDefault();err.textContent='';
- var b=(f.querySelector('input[name=block]:checked')||{}).value||'',lg=(f.querySelector('input[name=lg]:checked')||{}).value||'both';
- if(!b){err.textContent='اختاروا البلوك · Choose your block';return}
- if(!val('apt')){err.textContent='اكتبوا اسمكم أو الشقة · Enter your name or apartment';return}
+ var lg=(f.querySelector('input[name=lg]:checked')||{}).value||'both';
+ if(!who.value){err.textContent='اختاروا اسمكم · Select your name';return}
+ if(!val('nen')&&!val('nar')){err.textContent='اكتبوا اسمكم · Enter your name';return}
  if(digits(val('p1')).length<7){err.textContent='أدخلوا رقماً صحيحاً · Enter a valid phone number';return}
  if(val('p2')&&digits(val('p2')).length<7){err.textContent='الرقم الثاني غير صحيح · The second number looks wrong';return}
- var body={action:'reply',block:b,apt:val('apt'),p1:val('p1'),p2:val('p2'),lg:lg,dish:val('dish'),net:val('net'),other:val('other'),hp:val('hp')};
+ var body={action:'reply',id:(who.value==='other'?'':who.value),orig:(who.value==='other'?'':who.options[who.selectedIndex].text),nen:val('nen'),nar:val('nar'),p1:val('p1'),p2:val('p2'),lg:lg,dish:val('dish'),net:val('net'),other:val('other'),hp:val('hp')};
  go.disabled=true;
  fetch(EXEC,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(body),redirect:'follow'})
   .then(function(r){return r.json()})
