@@ -21,7 +21,7 @@
 /* Anas's page now lives here on GitHub; Apps Script ("Water Collect") only sends and saves the data.
    This small adapter gives the page the same google.script.run / google.script.url calls it used inside Apps Script,
    so the page code below is unchanged. A building rep's link (Block A split, Block B/C/D pages) still opens the Apps Script page. */
-var APPV='2026-11-04a';
+var APPV='2026-11-04b';
 (function(){
  var EXEC='https://script.google.com/macros/s/AKfycbw0aOri7KloAq29a1Mksi3w-JlOoP4EgYUpoBJlwdqmgKVh72xGGPlxY0j9SGYUIqnJUw/exec';
  var P=new URLSearchParams(location.search),K=P.get('k')||'',V=P.get('v')||'';
@@ -108,6 +108,7 @@ function fillTop(o){
  $('lcol').textContent=o.kind==='edl'?(LANG==='ar'?'دولار تم تحصيله':'USD collected'):T('col');var cs=o.kind==='edl'?'$':'';$('got').textContent=cs+nf(o.got);var rmn=Math.round((o.sum-o.got)*100)/100;$('rem').textContent=cs+nf(rmn);$('rem').style.color=(rmn>0?'':'#16a34a');$('cnt').textContent=T('paid',o.np,o.n);
  $('pb').style.width=(o.sum?Math.min(100,o.got/o.sum*100):0)+'%';
 }
+window.setP=function(i,v){return setP(i,v)};
 function setP(i,v){
  if(v)D.paid[i]=1;else delete D.paid[i];busy[i]=1;render();
  google.script.run.withSuccessHandler(function(p){delete busy[i];D.paid=p;render()}).withFailureHandler(function(e){delete busy[i];if(v)delete D.paid[i];else D.paid[i]=1;render();toast(T('nosave'))}).setPaid(TOK,i,v);
@@ -147,30 +148,38 @@ function CT(k){if(k==='c')return LANG==='ar'?'مبنى '+BL():'Block '+BL();retu
  function arMon(s){var M={january:'كانون الثاني',february:'شباط',march:'آذار',april:'نيسان',may:'أيار',june:'حزيران',july:'تموز',august:'آب',september:'أيلول',october:'تشرين الأول',november:'تشرين الثاني',december:'كانون الأول'},x=/^\s*([A-Za-z]+)\s+(\d{4})/.exec(String(s||''));return x&&M[x[1].toLowerCase()]?M[x[1].toLowerCase()]+' '+x[2]:String(s||'')}
  function usd(n){var x=Math.round(n*100)/100;return '$'+x.toLocaleString('en-US',{minimumFractionDigits:0,maximumFractionDigits:2})}
 function showTab(){pickB();var ls=bldList(),hasC=ls.length>0,hasE=edlOpen();$('tabs').style.display=(hasC||hasE)?'flex':'none';if(TAB==='e'&&!hasE)TAB='w';var onC=hasC&&TAB==='c',onE=hasE&&TAB==='e';$('te').style.display=hasE?'':'none';$('te').className=onE?'on':'';$('te').textContent='\u26A1 '+(LANG==='ar'?'الكهرباء':'EDL');$('tw').className=(onC||onE)?'':'on';$('tw').textContent=CT('w');['A','B','C','D'].forEach(function(L){var b=$('tb'+L);b.style.display=ls.indexOf(L)>=0?'':'none';b.className=(onC&&CURB===L)?'on':'';b.textContent=LANG==='ar'?'مبنى '+L:'Block '+L});$('cmain').style.display=onC?'block':'none';$('list').parentNode.style.display=onC?'none':'';if(onC)$('top').style.display='none';else if(D)$('top').style.display=''}
-CI.en.dcov='Dues covered';CI.ar.dcov='الالتزامات المغطاة';CI.en.dsec='Dues to cover';CI.ar.dsec='الالتزامات المطلوب تغطيتها';CI.en.bpool='Building bills';CI.ar.bpool='فواتير المبنى';CI.en.stl='settled';CI.ar.stl='سدّدوا';CI.en.edlc='EDL collected';CI.ar.edlc='الكهرباء المحصّلة';CI.en.bych='By charge';CI.ar.bych='حسب البند';
+CI.en.dcov='Dues covered';CI.ar.dcov='الالتزامات المغطاة';CI.en.dsec='Dues to cover';CI.ar.dsec='الالتزامات المطلوب تغطيتها';CI.en.bpool='Building bills';CI.ar.bpool='فواتير المبنى';CI.en.stl='settled';CI.ar.stl='سدّدوا';CI.en.wtrc='Water collected';CI.ar.wtrc='المياه المحصّلة';CI.en.edlc='EDL collected';CI.ar.edlc='الكهرباء المحصّلة';CI.en.bych='By charge';CI.ar.bych='حسب البند';
 function cname(c){return esc(LANG==='ar'&&c.la?c.la:c.l)}
 function ca(c,nm){return (c.ov&&c.ov[nm]!=null)?c.ov[nm]:c.a}
 function colSum(c){var t=0;((D&&D.blockc&&D.blockc.names)||[]).forEach(function(nm){t+=ca(c,nm)});return t}
-function allCols(bc){var cs=(bc&&bc.cols)||[];if(!bc||BL()!=='C'||!bc.codes||!D.hist)return cs;
- var hv=ensureHv(),hi=-1;for(var q=0;q<hv.length;q++){var r0=D.hist[hv[q]];if(r0&&r0.kind==='edl'){hi=hv[q];break}}
- if(hi<0)return cs;var r=D.hist[hi],ov={},idx={},any=false;
- (bc.names||[]).forEach(function(nm){var id=bc.codes[nm];if(!id)return;(r.rows||[]).forEach(function(x,i){if(x.k==='apt'&&x.id===id&&idx[nm]==null){idx[nm]=i;ov[nm]=num(x.a);any=true}})});
- if(!any)return cs;return cs.concat([{pk:'e:'+r.inv,l:'\u26A1 EDL',la:'\u26A1 \u0627\u0644\u0643\u0647\u0631\u0628\u0627\u0621',a:0,ov:ov,_e:{h:hi,idx:idx}}])}
+function allCols(bc){var cs=(bc&&bc.cols)||[];if(!bc||BL()!=='C'||!bc.codes)return cs;var out=cs.slice();
+ var hv=D.hist?ensureHv():[],hi=-1;for(var q=0;q<hv.length;q++){var r0=D.hist[hv[q]];if(r0&&r0.kind==='edl'){hi=hv[q];break}}
+ if(hi>=0){var r=D.hist[hi],ov={},idx={},any=false;
+  (bc.names||[]).forEach(function(nm){var id=bc.codes[nm];if(!id)return;(r.rows||[]).forEach(function(x,i){if(x.k==='apt'&&x.id===id&&idx[nm]==null){idx[nm]=i;ov[nm]=num(x.a);any=true}})});
+  if(any)out.push({pk:'e:'+r.inv,l:'⚡ EDL',la:'⚡ الكهرباء',a:0,ov:ov,_e:{h:hi,idx:idx}})}
+ /* the current water bill (LBP) counts in USD at the water round's exchange rate; the tick is the water invoice's own tick */
+ var rate=+bc.rate;if(rate>0&&D&&!D.curHidden&&D.rows){var wo={},wl={},wi={},wany=false;
+  (bc.names||[]).forEach(function(nm){var id=bc.codes[nm];if(!id)return;(D.rows||[]).forEach(function(x,i){if(x.k==='apt'&&!x.hid&&x.id===id&&wi[nm]==null){var a=num(x.a);if(a>0){wi[nm]=i;wl[nm]=a;wo[nm]=Math.round(a/rate*100)/100;wany=true}}})});
+  if(wany)out.push({pk:'w:'+(D.inv||''),l:'💧 Water',la:'💧 المياه',a:0,ov:wo,lbp:wl,_w:{idx:wi}})}
+ return out}
+window.allCols=allCols;
+window.bcPaidC=function(c,nm,bc){if(c._e){var er=D.hist[c._e.h];return !!(er&&er.paid&&er.paid[c._e.idx[nm]])}if(c._w)return !!(D.paid&&D.paid[c._w.idx[nm]]);return !!(bc.paid&&bc.paid[c.pk]&&bc.paid[c.pk][nm])};
 function renderC(){var bc=D&&D.blockc;if(!bc){$('cpanel').innerHTML='';return}
  var cols=allCols(bc),names=bc.names||[],pd=bc.paid||{},n=names.length;
- function isP(c,nm){if(c._e){var er=D.hist[c._e.h];return !!(er&&er.paid&&er.paid[c._e.idx[nm]])}return !!(pd[c.pk]&&pd[c.pk][nm])}
+ function isP(c,nm){return bcPaidC(c,nm,bc)}
  var sum=0,got=0,settled=0;
  cols.forEach(function(c){sum+=colSum(c);names.forEach(function(nm){if(isP(c,nm))got+=ca(c,nm)})});
  names.forEach(function(nm){if(cols.length&&cols.every(function(c){return ca(c,nm)<=0||isP(c,nm)}))settled++});
  var pct=sum?Math.round(got*100/sum):0;
  var maintCol=cols.filter(function(c){return c.pk.indexOf('m:maint:')===0})[0];
  function colGot(c){var k=0;names.forEach(function(nm){if(isP(c,nm))k+=ca(c,nm)});return k}
- var ec=cols.filter(function(c){return c._e})[0],edlh='';
+ var ec=cols.filter(function(c){return c._e})[0],wc=cols.filter(function(c){return c._w})[0],edlh='';
  if(ec){var eg=colGot(ec),es=colSum(ec),ep=es?Math.round(eg*100/es):0;edlh='<div class="sub" style="margin-top:8px"><span>\u26A1 '+CT('edlc')+'</span><span dir="ltr"><b>'+usd(eg)+'</b> / '+usd(es)+'</span></div><div class="bar"><i style="width:'+ep+'%"></i></div>'}
+ if(wc){var wg=colGot(wc),ws=colSum(wc),wp=ws?Math.round(wg*100/ws):0;edlh+='<div class="sub" style="margin-top:8px"><span>\uD83D\uDCA7 '+CT('wtrc')+'</span><span dir="ltr"><b>'+usd(wg)+'</b> / '+usd(ws)+'</span></div><div class="bar"><i style="width:'+wp+'%"></i></div>'}
  var B=0;(bc.bills||[]).forEach(function(b){B+=b.a});
  var dr=[];
  if(B>0)dr.push({l:CT('bpool'),req:B,got:maintCol?Math.min(colGot(maintCol),B):0});
- cols.forEach(function(c){if(c===maintCol||c._e)return;dr.push({l:cname(c),req:colSum(c),got:colGot(c),math:(c.ov&&Object.keys(c.ov).length)?'':usd(c.a)+' \u00d7 '+n})});
+ cols.forEach(function(c){if(c===maintCol||c._e||c._w)return;dr.push({l:cname(c),req:colSum(c),got:colGot(c),math:(c.ov&&Object.keys(c.ov).length)?'':usd(c.a)+' \u00d7 '+n})});
  var dreq=0,dgot=0;dr.forEach(function(r){dreq+=r.req;dgot+=r.got});var dp=dreq?Math.round(dgot*100/dreq):0;
  var cnt=LANG==='ar'?('سدّد '+settled+' من '+n):(settled+' of '+n+' '+CT('stl'));
  var h='<div class="top"><div class="t1"><b>'+esc(CT('c'))+'</b><span><bdi>'+esc(bc.month)+'</bdi></span></div><div class="big"><span dir="ltr">'+usd(got)+'</span> <small>'+CT('col')+'</small></div><div class="bar"><i style="width:'+pct+'%"></i></div><div class="sub"><span>'+cnt+'</span><span>'+CT('rem')+' <b dir="ltr" class="'+(sum-got>0?'rd':'rz')+'">'+usd(sum-got)+'</b></span></div>'+(dr.length?'<div class="sub" style="margin-top:8px"><span>'+CT('dcov')+'</span><span dir="ltr"><b>'+usd(dgot)+'</b> / '+usd(dreq)+'</span></div><div class="bar"><i style="width:'+dp+'%"></i></div>':'')+edlh+'<div class="cflt"><button id="cuo">'+esc(($('uo')&&$('uo').textContent)||'')+'</button></div></div>';
@@ -190,6 +199,7 @@ function renderC(){var bc=D&&D.blockc;if(!bc){$('cpanel').innerHTML='';return}
  if($('cuo'))$('cuo').onclick=function(){$('uo').click();renderC()};Array.prototype.forEach.call($('cpanel').querySelectorAll('button.chip'),function(el){el.onclick=function(){tickX(+el.getAttribute('data-c'),+el.getAttribute('data-n'))}})}
 function tickX(ci,ni){var bc=D.blockc,c=allCols(bc)[ci],nm=bc.names[ni],k='c'+ci+'_'+ni;if(busy[k])return;
  if(c&&c._e){if(window.setH&&c._e.idx[nm]!=null)window.setH(c._e.h,c._e.idx[nm]);return}
+ if(c&&c._w){var wi=c._w.idx[nm];if(wi!=null&&!busy[wi])window.setP(wi,!(D.paid&&D.paid[wi]));return}
  if(!bc.paid[c.pk]||typeof bc.paid[c.pk]!=='object')bc.paid[c.pk]={};
  var v=!bc.paid[c.pk][nm];busy[k]=1;if(v)bc.paid[c.pk][nm]=true;else delete bc.paid[c.pk][nm];renderC();
  function undo(){if(v)delete bc.paid[c.pk][nm];else bc.paid[c.pk][nm]=true;renderC()}
@@ -319,8 +329,8 @@ $('list').onclick=function(e){var db=e.target.closest?e.target.closest('.dfb'):n
    +'\n\n'
    +'Hello *'+r.n+'*, 👋\n\nYour share of the EDL (electricity) bill — *'+p+'* — comes out to a total of *'+r.a+' USD* 📊⚡.\n\n👉 *Please settle this amount by passing it to Anas.*\n\nThank you for your valued cooperation! 🙏✨'
    +'\n\n'+NOTE}
- function bcMsg(bc,nm){var cols=bc.cols||[],pd=bc.paid||{},en='',ar='',due=0,an=(bc.nameAr&&bc.nameAr[nm])||nm;
-  cols.forEach(function(c){var a=(c.ov&&c.ov[nm]!=null)?c.ov[nm]:c.a;if(!(a>0))return;var p=pd[c.pk]&&pd[c.pk][nm];en+='• '+c.l+': '+usd(a)+(p?' ✅':'')+'\n';ar+='• '+(c.la||c.l)+': '+usd(a)+(p?' ✅':'')+'\n';if(!p)due+=a});
+ function bcMsg(bc,nm){var cols=window.allCols(bc),pd=bc.paid||{},en='',ar='',due=0,an=(bc.nameAr&&bc.nameAr[nm])||nm;
+  cols.forEach(function(c){var a=(c.ov&&c.ov[nm]!=null)?c.ov[nm]:c.a;if(!(a>0))return;var p=window.bcPaidC(c,nm,bc),lb=(c.lbp&&c.lbp[nm])?' ('+String(Math.round(c.lbp[nm])).replace(/\B(?=(\d{3})+(?!\d))/g,',')+' LBP)':'';en+='• '+c.l+': '+usd(a)+lb+(p?' ✅':'')+'\n';ar+='• '+(c.la||c.l)+': '+usd(a)+lb+(p?' ✅':'')+'\n';if(!p)due+=a});
   if(!(due>0))return wrap('تحية طيبة *'+an+'*، 👋\n\nالبلوك C\u200F · *'+arMon(bc.month)+'*\n\nلا يترتب عليكم أي مبلغ هذا الشهر — كل شيء مسدّد. ✅\n\nنشكر لكم حسن تعاونكم معنا! 🙏✨','Hello *'+nm+'*, 👋\n\nBlock C · *'+bc.month+'*\n\nYou have nothing to pay this month — all settled. ✅\n\nThank you for your valued cooperation! 🙏✨');
   return wrap('تحية طيبة *'+an+'*، 👋\n\nالبلوك C\u200F · *'+arMon(bc.month)+'*\n'+ar+'\n👉 *المبلغ المستحق: '+usd(due)+' — يُرجى تسليمه إلى أنس.*\n\nنشكر لكم حسن تعاونكم معنا! 🙏✨','Hello *'+nm+'*, 👋\n\nBlock C · *'+bc.month+'*\n'+en+'\n👉 *Total due: '+usd(due)+' — please pass it to Anas.*\n\nThank you for your valued cooperation! 🙏✨')}
  window.annAdd=function(){try{
@@ -414,14 +424,15 @@ upd()})();
 
  /* ---------- Block C ---------- */
  function bcRc(bc,nm){
-  var cols=bc.cols||[], pd=bc.paid||{}, an=(bc.nameAr&&bc.nameAr[nm])||nm;
+  var cols=window.allCols(bc), pd=bc.paid||{}, an=(bc.nameAr&&bc.nameAr[nm])||nm;
   var pA='',pE='',lA='',lE='',tp=0,tl=0;
   cols.forEach(function(c){
    var a=(c.ov&&c.ov[nm]!=null)?c.ov[nm]:c.a;
    if(!(a>0))return;
    var ar=c.la||c.l, en=c.l;
-   if(pd[c.pk]&&pd[c.pk][nm]){tp+=a;pA+='• '+ar+': '+usd(a)+' ✅\n';pE+='• '+en+': '+usd(a)+' ✅\n'}
-   else{tl+=a;lA+='• '+ar+': '+usd(a)+'\n';lE+='• '+en+': '+usd(a)+'\n'}
+   var lb=(c.lbp&&c.lbp[nm])?' ('+nf(Math.round(c.lbp[nm]))+' LBP)':'';
+   if(window.bcPaidC(c,nm,bc)){tp+=a;pA+='• '+ar+': '+usd(a)+lb+' ✅\n';pE+='• '+en+': '+usd(a)+lb+' ✅\n'}
+   else{tl+=a;lA+='• '+ar+': '+usd(a)+lb+'\n';lE+='• '+en+': '+usd(a)+lb+'\n'}
   });
   if(!(tp>0))return null;
   var ar='تحية طيبة *'+an+'*، 👋\n\nالبلوك C\u200F · *'+arMon(bc.month)+'*\n\n✅ *إيصال استلام* — وصلنا منكم *'+usd(tp)+'*:\n'+pA+'\n'
