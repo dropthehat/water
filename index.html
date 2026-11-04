@@ -21,7 +21,7 @@
 /* Anas's page now lives here on GitHub; Apps Script ("Water Collect") only sends and saves the data.
    This small adapter gives the page the same google.script.run / google.script.url calls it used inside Apps Script,
    so the page code below is unchanged. A building rep's link (Block A split, Block B/C/D pages) still opens the Apps Script page. */
-var APPV='2026-11-04c';
+var APPV='2026-11-04d';
 (function(){
  var EXEC='https://script.google.com/macros/s/AKfycbw0aOri7KloAq29a1Mksi3w-JlOoP4EgYUpoBJlwdqmgKVh72xGGPlxY0j9SGYUIqnJUw/exec';
  var P=new URLSearchParams(location.search),K=P.get('k')||'',V=P.get('v')||'';
@@ -160,7 +160,7 @@ function allCols(bc){var cs=(bc&&bc.cols)||[];if(!bc||BL()!=='C'||!bc.codes)retu
  /* the current water bill (LBP) counts in USD at the water round's exchange rate; the tick is the water invoice's own tick */
  var rate=+bc.rate;if(rate>0&&D&&!D.curHidden&&D.rows){var wo={},wl={},wi={},wany=false;
   (bc.names||[]).forEach(function(nm){var id=bc.codes[nm];if(!id)return;(D.rows||[]).forEach(function(x,i){if(x.k==='apt'&&!x.hid&&x.id===id&&wi[nm]==null){var a=num(x.a);if(a>0){wi[nm]=i;wl[nm]=a;wo[nm]=Math.round(a/rate*100)/100;wany=true}}})});
-  if(wany)out.push({pk:'w:'+(D.inv||''),l:'💧 Water',la:'💧 المياه',a:0,ov:wo,lbp:wl,_w:{idx:wi}})}
+  if(wany)out.push({pk:'w:'+(D.inv||''),l:'💧 Water'+(D.inv?' '+D.inv:''),la:'💧 المياه'+(D.inv?' '+D.inv:''),a:0,ov:wo,lbp:wl,_w:{idx:wi}})}
  return out}
 window.allCols=allCols;
 window.bcPaidC=function(c,nm,bc){if(c._e){var er=D.hist[c._e.h];return !!(er&&er.paid&&er.paid[c._e.idx[nm]])}if(c._w)return !!(D.paid&&D.paid[c._w.idx[nm]]);return !!(bc.paid&&bc.paid[c.pk]&&bc.paid[c.pk][nm])};
