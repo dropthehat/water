@@ -21,7 +21,7 @@
 /* Anas's page now lives here on GitHub; Apps Script ("Water Collect") only sends and saves the data.
    This small adapter gives the page the same google.script.run / google.script.url calls it used inside Apps Script,
    so the page code below is unchanged. A building rep's link (Block A split, Block B/C/D pages) still opens the Apps Script page. */
-var APPV='2026-11-04b';
+var APPV='2026-11-04c';
 (function(){
  var EXEC='https://script.google.com/macros/s/AKfycbw0aOri7KloAq29a1Mksi3w-JlOoP4EgYUpoBJlwdqmgKVh72xGGPlxY0j9SGYUIqnJUw/exec';
  var P=new URLSearchParams(location.search),K=P.get('k')||'',V=P.get('v')||'';
@@ -297,6 +297,11 @@ $('list').onclick=function(e){var db=e.target.closest?e.target.closest('.dfb'):n
  window.waPhB=function(bc,nm){var p=bc&&bc.phones&&bc.phones[nm];if(!p)return '';var q=bc.phones2&&bc.phones2[nm];if(!q)return p;var l=(bc.plabels&&bc.plabels[nm])||[];return p+'~'+(l[0]||'')+'|'+q+'~'+(l[1]||'')};
  window.waLink=function(ph,msg){ph=String(ph);if(ph.indexOf('|')<0)return 'https://wa.me/'+ph+'?text='+enc(msg);
   var L=ph.split('|').map(function(x){var a=x.split('~');return {n:a[0],l:a[1]||'',h:'https://wa.me/'+a[0]+'?text='+enc(msg)}});return 'wapick:'+enc(JSON.stringify(L))};
+ window.wlg=function(v){v=String(v||'').trim().toLowerCase();return (v.indexOf('ar')===0||v.indexOf('\u0639')===0)?'ar':(v.indexOf('en')===0)?'en':'both'};
+ window.lgR=function(r){if(r&&r.lg)return wlg(r.lg);var f='';try{(D.hist||[]).concat([D]).forEach(function(rd){(rd.rows||[]).forEach(function(x){if(!f&&x.lg&&r&&((r.id&&x.id===r.id)||x.n===r.n))f=x.lg})})}catch(e){}return wlg(f)};
+ window.hd=function(h,L){if(L!=='ar'&&L!=='en')return h;var m=/^(\S+) \*(.*?) \u00b7 (.*)\*$/.exec(h);if(!m)return h;return m[1]+' *'+(L==='ar'?m[2]:m[3])+'*'};
+ window.ft=function(L){return '\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n\ud83d\udca7 *'+(L==='ar'?'\u0628\u0646\u0627\u064a\u062a\u0646\u0627':L==='en'?'Our Building':'\u0628\u0646\u0627\u064a\u062a\u0646\u0627 \u00b7 Our Building')+'*'};
+ window.jn=function(a,e,L){return L==='ar'?a:L==='en'?e:a+'\n\n'+e};
  window.waHref=function(a,href){if(href.indexOf('wapick:')===0){a.href='#';a.removeAttribute('target');a.setAttribute('data-pick',href.slice(7))}else a.href=href};
  function pick(L){var old=document.getElementById('wapick');if(old)old.remove();
   var o=document.createElement('div');o.id='wapick';o.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:99999;display:flex;align-items:flex-end;justify-content:center';
@@ -317,19 +322,17 @@ $('list').onclick=function(e){var db=e.target.closest?e.target.closest('.dfb'):n
  function mk(href){var a=document.createElement('a');a.className='wa';a.target='_blank';a.rel='noopener';waHref(a,href);a.title='WhatsApp';a.textContent='📣';return a}
  var HI_W='💧 *فاتورة المياه · Water Invoice*', HI_B='🏢 *فاتورة البلوك C\u200F · Block C Invoice*', HR_W='🧾 *إيصال المياه · Water Receipt*', HR_B='🧾 *إيصال البلوك C\u200F · Block C Receipt*';
  var NOTE='────────────────────\n💧 *بنايتنا · Our Building*';
- function wrap(ar,en){var rc=ar.indexOf('إيصال استلام')>-1,bk=ar.indexOf('البلوك C')>-1,HDR=rc?(bk?HR_B:HR_W):(bk?HI_B:HI_W);var t=HDR+'\n\n'+ar+'\n\n'+en+'\n\n'+NOTE;return (bk&&BL()!=='C')?t.replace(/البلوك C/g,'البلوك '+BL()).replace(/Block C/g,'Block '+BL()):t}
- function waterMsg(r,per){var p=per||D.period||'';
+ function wrap(ar,en){var rc=ar.indexOf('إيصال استلام')>-1,bk=ar.indexOf('البلوك C')>-1,HDR=rc?(bk?HR_B:HR_W):(bk?HI_B:HI_W);var L=window.__LG||'both',t=hd(HDR,L)+'\n\n'+jn(ar,en,L)+'\n\n'+ft(L);return (bk&&BL()!=='C')?t.replace(/البلوك C/g,'البلوك '+BL()).replace(/Block C/g,'Block '+BL()):t}
+ function waterMsg(r,per){window.__LG=lgR(r);var p=per||D.period||'';
   if(!(num(r.a)>0))return wrap('تحية طيبة *'+r.n+'*، 👋\n\nبلغت قيمة فاتورة المياه الخاصة بكم للفترة *'+p.replace(' to ',' إلى ')+'* ما مجموعه *0 ل.ل.* 💧 — لا يترتب عليكم أي مبلغ في هذه الدورة. 🎉\n\nنشكر لكم حسن تعاونكم معنا! 🙏✨','Hello *'+r.n+'*, 👋\n\nYour water bill for the period *'+p+'* comes out to *0 LBP* 💧 — you have nothing to pay this round. 🎉\n\nThank you for your valued cooperation! 🙏✨');
   return wrap('تحية طيبة *'+r.n+'*، 👋\n\nبلغت قيمة فاتورة المياه الخاصة بكم للفترة *'+p.replace(' to ',' إلى ')+'* ما مجموعه *'+r.a+' ل.ل.* 📊💧.\n\n👉 *يُرجى تسديد هذا المبلغ وتسليمه إلى أنس.*\n\nنشكر لكم حسن تعاونكم معنا! 🙏✨','Hello *'+r.n+'*, 👋\n\nYour water bill for the period *'+p+'* comes out to a total of *'+r.a+' LBP* 📊💧.\n\n👉 *Please settle this amount by passing it to Anas.*\n\nThank you for your valued cooperation! 🙏✨')}
  function arMon(s){var M={january:'كانون الثاني',february:'شباط',march:'آذار',april:'نيسان',may:'أيار',june:'حزيران',july:'تموز',august:'آب',september:'أيلول',october:'تشرين الأول',november:'تشرين الثاني',december:'كانون الأول'},x=/^\s*([A-Za-z]+)\s+(\d{4})/.exec(String(s||''));return x&&M[x[1].toLowerCase()]?M[x[1].toLowerCase()]+' '+x[2]:String(s||'')}
  function usd(x){return '$'+(Math.round(x*100)/100)}
- function edlMsg(r,per){var p=per||'';
-  return '⚡ *فاتورة الكهرباء · EDL Invoice*\n\n'
-   +'تحية طيبة *'+r.n+'*، 👋\n\nبلغت حصتكم من فاتورة الكهرباء (EDL) — *'+p+'* — ما مجموعه *'+r.a+' دولار* 📊⚡.\n\n👉 *يُرجى تسديد هذا المبلغ وتسليمه إلى أنس.*\n\nنشكر لكم حسن تعاونكم معنا! 🙏✨'
-   +'\n\n'
-   +'Hello *'+r.n+'*, 👋\n\nYour share of the EDL (electricity) bill — *'+p+'* — comes out to a total of *'+r.a+' USD* 📊⚡.\n\n👉 *Please settle this amount by passing it to Anas.*\n\nThank you for your valued cooperation! 🙏✨'
-   +'\n\n'+NOTE}
- function bcMsg(bc,nm){var cols=window.allCols(bc),pd=bc.paid||{},en='',ar='',due=0,an=(bc.nameAr&&bc.nameAr[nm])||nm;
+ function edlMsg(r,per){window.__LG=lgR(r);var p=per||'',L=window.__LG;
+  return hd('⚡ *فاتورة الكهرباء · EDL Invoice*',L)+'\n\n'+jn(
+   'تحية طيبة *'+r.n+'*، 👋\n\nبلغت حصتكم من فاتورة الكهرباء (EDL) — *'+p+'* — ما مجموعه *'+r.a+' دولار* 📊⚡.\n\n👉 *يُرجى تسديد هذا المبلغ وتسليمه إلى أنس.*\n\nنشكر لكم حسن تعاونكم معنا! 🙏✨',
+   'Hello *'+r.n+'*, 👋\n\nYour share of the EDL (electricity) bill — *'+p+'* — comes out to a total of *'+r.a+' USD* 📊⚡.\n\n👉 *Please settle this amount by passing it to Anas.*\n\nThank you for your valued cooperation! 🙏✨',L)+'\n\n'+ft(L)}
+ function bcMsg(bc,nm){window.__LG=wlg(bc.langs&&bc.langs[nm]);var cols=window.allCols(bc),pd=bc.paid||{},en='',ar='',due=0,an=(bc.nameAr&&bc.nameAr[nm])||nm;
   cols.forEach(function(c){var a=(c.ov&&c.ov[nm]!=null)?c.ov[nm]:c.a;if(!(a>0))return;var p=window.bcPaidC(c,nm,bc),lb=(c.lbp&&c.lbp[nm])?' ('+String(Math.round(c.lbp[nm])).replace(/\B(?=(\d{3})+(?!\d))/g,',')+' LBP)':'';en+='• '+c.l+': '+usd(a)+lb+(p?' ✅':'')+'\n';ar+='• '+(c.la||c.l)+': '+usd(a)+lb+(p?' ✅':'')+'\n';if(!p)due+=a});
   if(!(due>0))return wrap('تحية طيبة *'+an+'*، 👋\n\nالبلوك C\u200F · *'+arMon(bc.month)+'*\n\nلا يترتب عليكم أي مبلغ هذا الشهر — كل شيء مسدّد. ✅\n\nنشكر لكم حسن تعاونكم معنا! 🙏✨','Hello *'+nm+'*, 👋\n\nBlock C · *'+bc.month+'*\n\nYou have nothing to pay this month — all settled. ✅\n\nThank you for your valued cooperation! 🙏✨');
   return wrap('تحية طيبة *'+an+'*، 👋\n\nالبلوك C\u200F · *'+arMon(bc.month)+'*\n'+ar+'\n👉 *المبلغ المستحق: '+usd(due)+' — يُرجى تسليمه إلى أنس.*\n\nنشكر لكم حسن تعاونكم معنا! 🙏✨','Hello *'+nm+'*, 👋\n\nBlock C · *'+bc.month+'*\n'+en+'\n👉 *Total due: '+usd(due)+' — please pass it to Anas.*\n\nThank you for your valued cooperation! 🙏✨')}
@@ -377,7 +380,7 @@ upd()})();
  function arMon(s){var M={january:'كانون الثاني',february:'شباط',march:'آذار',april:'نيسان',may:'أيار',june:'حزيران',july:'تموز',august:'آب',september:'أيلول',october:'تشرين الأول',november:'تشرين الثاني',december:'كانون الأول'},x=/^\s*([A-Za-z]+)\s+(\d{4})/.exec(String(s||''));return x&&M[x[1].toLowerCase()]?M[x[1].toLowerCase()]+' '+x[2]:String(s||'')}
  function usd(x){return '$'+(Math.round(x*100)/100)}
  function link(ph,msg){return waLink(ph,msg)}
- function wrap(ar,en){var rc=ar.indexOf('إيصال استلام')>-1,bk=ar.indexOf('البلوك C')>-1,HDR=rc?(bk?HR_B:HR_W):(bk?HI_B:HI_W);var t=HDR+'\n\n'+ar+'\n\n'+en+'\n\n'+NOTE;return (bk&&BL()!=='C')?t.replace(/البلوك C/g,'البلوك '+BL()).replace(/Block C/g,'Block '+BL()):t}
+ function wrap(ar,en){var rc=ar.indexOf('إيصال استلام')>-1,bk=ar.indexOf('البلوك C')>-1,HDR=rc?(bk?HR_B:HR_W):(bk?HI_B:HI_W);var L=window.__LG||'both',t=hd(HDR,L)+'\n\n'+jn(ar,en,L)+'\n\n'+ft(L);return (bk&&BL()!=='C')?t.replace(/البلوك C/g,'البلوك '+BL()).replace(/Block C/g,'Block '+BL()):t}
  function mk(href){var a=document.createElement('a');a.className='rc';a.target='_blank';a.rel='noopener';waHref(a,href);a.title='Receipt';a.textContent='🧾';return a}
 
  /* ---------- Water ---------- */
@@ -400,6 +403,7 @@ upd()})();
   return out;
  }
  function edlRc(r,ro,idx){
+  window.__LG=lgR(r);
   var p=ro.period||'', a=num(r.a), left=leftWater(r,ro,idx), sum=0, lar='', len='';
   left.forEach(function(x){sum+=x.a;lar+='• '+x.p+': '+nf(x.a)+' دولار\n';len+='• '+x.p+': '+nf(x.a)+' USD\n'});
   var ar='تحية طيبة *'+r.n+'*، 👋\n\n✅ *إيصال استلام* — وصلنا منكم *'+nf(a)+' دولار* عن فاتورة الكهرباء (EDL) — *'+p+'*. ⚡\n\n'
@@ -408,9 +412,10 @@ upd()})();
   var en='Hello *'+r.n+'*, 👋\n\n✅ *Payment receipt* — we received *'+nf(a)+' USD* for the EDL (electricity) bill — *'+p+'*. ⚡\n\n'
    +(sum?'⚠️ *Still remaining:*\n'+len+'*Total: '+nf(sum)+' USD*\n\nPlease settle it when you can.':'🎉 Nothing is left to pay — you are all settled.')
    +'\n\nThank you for your valued cooperation! 🙏✨';
-  return '🧾 *إيصال الكهرباء · EDL Receipt*\n\n'+ar+'\n\n'+en+'\n\n'+NOTE;
+  var L=window.__LG;return hd('🧾 *إيصال الكهرباء · EDL Receipt*',L)+'\n\n'+jn(ar,en,L)+'\n\n'+ft(L);
  }
  function waterRc(r,ro,idx){
+  window.__LG=lgR(r);
   var p=ro.period||'', a=num(r.a), left=leftWater(r,ro,idx), sum=0, lar='', len='';
   left.forEach(function(x){sum+=x.a;lar+='• '+x.p+': '+nf(x.a)+' ل.ل.\n';len+='• '+x.p+': '+nf(x.a)+' LBP\n'});
   var ar='تحية طيبة *'+r.n+'*، 👋\n\n✅ *إيصال استلام* — وصلنا منكم *'+nf(a)+' ل.ل.* عن فاتورة المياه للفترة *'+p.replace(' to ',' إلى ')+'*. 💧\n\n'
@@ -424,6 +429,7 @@ upd()})();
 
  /* ---------- Block C ---------- */
  function bcRc(bc,nm){
+  window.__LG=wlg(bc.langs&&bc.langs[nm]);
   var cols=window.allCols(bc), pd=bc.paid||{}, an=(bc.nameAr&&bc.nameAr[nm])||nm;
   var pA='',pE='',lA='',lE='',tp=0,tl=0;
   cols.forEach(function(c){
